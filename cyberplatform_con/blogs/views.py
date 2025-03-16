@@ -13,8 +13,8 @@ def blog_list(request):
     }
     return render(request,'blogs.html',context)
 
-def blog_detail(request,category_slug,course_id):
-    blog = Blog.objects.get(category__slug=category_slug,id = course_id)
+def blog_detail(request,category_slug,blog_id):
+    blog = Blog.objects.get(category__slug=category_slug,id = blog_id)
     
     context = {
         'blog':blog
@@ -34,6 +34,17 @@ def category_list(request,category_slug):
 
 def tag_list(request,tag_slug):
     blogs= Blog.objects.all().filter(tags__slug=tag_slug)
+    categories = Category.objects.all()
+    tags = Tag.objects.all()
+    context = {
+        'blogs':blogs,
+         'categories':categories,
+         'tags':tags
+    }
+    return render(request,'blogs.html',context)
+
+def search(request):
+    blogs = Blog.objects.filter(name__contains = request.GET['search'])
     categories = Category.objects.all()
     tags = Tag.objects.all()
     context = {
