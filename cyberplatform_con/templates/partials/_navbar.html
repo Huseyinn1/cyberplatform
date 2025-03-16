@@ -30,7 +30,20 @@
                     <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a class="hover-btn-new log orange" href="#" data-toggle="modal" data-target="#login"><span>Giriş Yap</span></a></li>
+                    {% if user.is_authenticated %}
+                    <li><a class="hover-btn-new log orange mr-2" href="{% url 'dashboard' %}"><span>{{user.username}}</span></a></li>
+                    <li><a class="hover-btn-new log orange" href="javascript:{document.getElementById('logout').submit()}"><span><i class="fa fa-sign-out"></i></span></a>
+                        <form action="{% url 'logout' %}" method="POST" id="logout">
+                            {% csrf_token %}
+                            <input type="hidden">
+                        </form>
+                    </li>
+                    
+                    {% else %}
+                    <li><a class="hover-btn-new log orange mr-2" href="{% url 'login' %}"><span><i class="fa fa-sign-in"></i></span></a></li>
+                    <li><a class="hover-btn-new log orange" href="{% url 'register' %}"><span><i class="fa fa-user-plus"></i></span></a></li>
+
+                    {% endif %}
                 </ul>
             </div>
         </div>
