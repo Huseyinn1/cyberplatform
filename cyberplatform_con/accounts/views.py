@@ -57,5 +57,29 @@ def user_logout(request):
 @login_required(login_url='login')
 def user_dashboard(request):
     current_user = request.user
-    return render(request,'dashboard.html')
+
+    blogs = current_user.blogs_joined.all()
+
+    context = {
+        'blogs': blogs
+    }
+
+    return render(request, 'dashboard.html', context)
+
+def enroll_the_blog(request):
+    blog_id = request.POST['blog_id']
+    user_id = request.POST['user_id']
+    blog = Blog.objects.get(id = blog_id)
+    user = User.objects.get(id = user_id)
+    blog.customer.add(user)
+    return redirect('dashboard')
+
+
+
+def release_the_blog(request):
+    blog = Blog.objects.get(id = request.POST['blog_id'])
+    user = User.objects.get(id = request.POST['user_id'])
+    blog.customer.remove(user)
+    return redirect('dashboard')
+
     

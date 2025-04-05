@@ -5,6 +5,16 @@ def blog_list(request):
     blogs = Blog.objects.all().order_by('-date')
     categories = Category.objects.all()
     tags = Tag.objects.all()
+    current_user = request.user
+    
+    if current_user.is_authenticated:
+        enrolled_blogs = current_user.blogs_joined.all()
+        blogs = Blog.objects.all().order_by('-date')
+        for blog in enrolled_blogs:
+            blogs = blogs.exclude(id = blog.id)
+
+    else:
+        blogs = Blog.objects.all().order_by('-date')
     context = {
         
         'blogs' : blogs,
@@ -14,10 +24,22 @@ def blog_list(request):
     return render(request,'blogs.html',context)
 
 def blog_detail(request,category_slug,blog_id):
+    current_user = request.user
     blog = Blog.objects.get(category__slug=category_slug,id = blog_id)
+    blogs = Blog.objects.all().order_by('-date')
+    categories = Category.objects.all()
+    tags = Tag.objects.all()
     
+    if current_user.is_authenticated:
+        enrolled_blogs = current_user.blogs_joined.all()
+    
+    else:
+        enrolled_blogs =  Blog.objects.all()
     context = {
-        'blog':blog
+        'blog':blog,
+        'enrolled_blogs' : enrolled_blogs,
+        'categories': categories,
+        'tags':tags
     }
     return render(request,'blog.html',context)
 
