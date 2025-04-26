@@ -1,0 +1,432 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Courier New', Courier, monospace;
+        background: #121212;
+        color: #e0e0e0;
+    }
+
+    .page-container {
+        display: flex;
+        height: 100vh;
+        background: linear-gradient(to right, #1a1a1a, #121212);
+    }
+
+    .left-box {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        position: relative;
+        flex-direction: column;
+    }
+
+    .welcome-message {
+        font-size: 36px;
+        color: #FF6600;
+        text-align: center;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-shadow: 0px 0px 10px #FF6600;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+
+    .upload-box {
+        background-color: #1c1c1c;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        width: 100%;
+        max-width: 600px;
+        border: 2px solid #333;
+    }
+
+    .upload-box h1 {
+        font-size: 28px;
+        margin-bottom: 30px;
+        text-align: center;
+        color: #FF6600;
+        text-shadow: 0px 0px 15px #FF6600;
+    }
+
+    .upload-box input[type="file"] {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+    }
+
+    .upload-box button {
+        background-color: #FF6600;
+        color: black;
+        padding: 12px 25px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s ease;
+    }
+
+    .upload-box button:hover {
+        background-color: #FF4500;
+    }
+
+    .right-box {
+        flex: 1;
+        padding: 40px;
+        overflow-y: auto;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .result-box {
+        background-color: #1c1c1c;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(255, 102, 0, 0.3);
+        height: 100%;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        border: 2px solid #333;
+    }
+
+    #loadingSpinner {
+        display: none;
+        font-style: italic;
+        color: #777;
+        margin-top: 15px;
+    }
+
+    #result {
+        margin-top: 0;
+    }
+
+    .section-bar {
+        background-color: #FF6600;
+        color: black;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+        margin-top: 10px;
+        text-shadow: 0px 0px 15px #FF6600;
+        margin-bottom: 5px;
+    }
+
+    .section-content {
+        padding: 15px;
+        background-color: #333;
+        color: #fff;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .findings-list {
+        margin-top: 15px;
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .findings-list li {
+        background-color: #2c2c2c;
+        padding: 10px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(255, 102, 0, 0.3);
+    }
+
+    .findings-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .findings-item span {
+        padding: 5px;
+        margin: 3px;
+        border-radius: 5px;
+        color: #fff;
+        font-weight: bold;
+        font-size: 14px;
+        text-shadow: 0px 0px 5px #FF6600;
+    }
+
+    .type {
+        background-color: #FF6600;
+    }
+
+    .value {
+        background-color: #1E90FF;
+    }
+
+    .valid {
+        background-color: #32CD32;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #FF6600;
+        font-size: 24px;
+        font-weight: bold;
+        z-index: 9999;
+        display: none;
+    }
+
+    .loading-overlay .spinner {
+        border: 4px solid transparent;
+        border-top: 4px solid #FF6600;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    h2 {
+        color: #FF6600;
+    }
+
+    .download-btn {
+        background-color: #FF6600;
+        color: black;
+        padding: 12px 25px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s ease;
+        margin-top: 20px;
+    }
+
+    .download-btn:hover {
+        background-color: #FF4500;
+    }
+</style>
+
+<div class="page-container">
+    <div class="left-box" id="leftBox">
+        <div id="welcomeMessage" class="welcome-message">
+            Welcome to the Dark Side
+        </div>
+        <div class="upload-box">
+            <h1>OCR için Görsel Yükle</h1>
+            <form id="uploadForm">
+                <input type="file" id="imageInput" name="image" accept="image/*" required>
+                <button type="submit">Gönder</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="right-box" id="rightBox">
+        <div class="result-box">
+            <h2>Sonuçlar</h2>
+            <div id="result">
+                Henüz bir veri yok.
+            </div>
+            <!-- PDF indirme butonu -->
+            <button id="downloadPDF" class="download-btn" style="display:none;">PDF Olarak İndir</button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p>Analiz ediliyor...</p>
+</div>
+
+<!-- jsPDF kütüphanesini ekliyoruz -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    function animateWelcomeMessage() {
+        const message = document.getElementById('welcomeMessage');
+        const text = message.innerText;
+        message.innerText = '';
+        let index = 0;
+
+        function typeCharacter() {
+            if (index < text.length) {
+                message.innerText += text[index];
+                index++;
+                setTimeout(typeCharacter, 150);
+            }
+        }
+
+        typeCharacter();
+    }
+
+    window.onload = function() {
+        animateWelcomeMessage();
+    };
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const fileInput = document.getElementById('imageInput');
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById('result').innerText = "";
+
+        document.getElementById('rightBox').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('rightBox').style.opacity = '1';
+        }, 100);
+
+        fetch('https://e773-78-186-219-19.ngrok-free.app/analyze_image/', {
+            method: 'POST',
+            headers: { 'accept': 'application/json' },
+            body: formData
+        })
+        .then(async response => {
+            setTimeout(async () => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+                const data = await response.json();
+                displayResults(data);
+            }, 2000);
+        })
+        .catch(error => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('result').innerText = "Hata oluştu:\n" + error.message;
+        });
+    });
+
+    function displayResults(data) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '';
+
+        const contentDiv = document.createElement('div');
+        const contentBar = document.createElement('div');
+        contentBar.classList.add('section-bar');
+        contentBar.innerText = 'Content';
+        const contentText = document.createElement('div');
+        contentText.classList.add('section-content');
+        contentText.innerText = data.content;
+        contentDiv.appendChild(contentBar);
+        contentDiv.appendChild(contentText);
+        resultDiv.appendChild(contentDiv);
+
+        const statusDiv = document.createElement('div');
+        const statusBar = document.createElement('div');
+        statusBar.classList.add('section-bar');
+        statusBar.innerText = 'Status';
+        const statusText = document.createElement('div');
+        statusText.classList.add('section-content');
+        statusText.innerText = data.status;
+        statusDiv.appendChild(statusBar);
+        statusDiv.appendChild(statusText);
+        resultDiv.appendChild(statusDiv);
+
+        if (data.findings && data.findings.length > 0) {
+            const findingsDiv = document.createElement('div');
+            const findingsBar = document.createElement('div');
+            findingsBar.classList.add('section-bar');
+            findingsBar.innerText = 'Findings';
+        
+            const findingsTable = document.createElement('table');
+            findingsTable.style.width = '100%';
+            findingsTable.style.borderCollapse = 'collapse';
+            findingsTable.style.marginTop = '10px';
+        
+            // Tablo başlıkları
+            const headerRow = document.createElement('tr');
+            ['Type', 'Value', 'Valid'].forEach(text => {
+                const th = document.createElement('th');
+                th.innerText = text;
+                th.style.border = '1px solid #FF6600';
+                th.style.padding = '10px';
+                th.style.backgroundColor = '#1c1c1c';
+                th.style.color = '#FF6600';
+                th.style.textAlign = 'center';
+                th.style.fontSize = '16px';
+                th.style.textShadow = '0px 0px 5px #FF6600';
+                headerRow.appendChild(th);
+            });
+            findingsTable.appendChild(headerRow);
+        
+            // Tablo verileri
+            data.findings.forEach(finding => {
+                const row = document.createElement('tr');
+        
+                const typeCell = document.createElement('td');
+                typeCell.innerText = finding.type;
+                typeCell.style.border = '1px solid #333';
+                typeCell.style.padding = '10px';
+                typeCell.style.textAlign = 'center';
+                typeCell.style.color = '#fff';
+        
+                const valueCell = document.createElement('td');
+                valueCell.innerText = finding.value;
+                valueCell.style.border = '1px solid #333';
+                valueCell.style.padding = '10px';
+                valueCell.style.textAlign = 'center';
+                valueCell.style.color = '#fff';
+        
+                const validCell = document.createElement('td');
+                validCell.innerText = Array.isArray(finding.is_valid) ? finding.is_valid.join(', ') : finding.is_valid;
+                validCell.style.border = '1px solid #333';
+                validCell.style.padding = '10px';
+                validCell.style.textAlign = 'center';
+                validCell.style.color = finding.is_valid === true || (Array.isArray(finding.is_valid) && finding.is_valid.includes(true)) ? '#32CD32' : '#FF4500';
+        
+                row.appendChild(typeCell);
+                row.appendChild(valueCell);
+                row.appendChild(validCell);
+        
+                findingsTable.appendChild(row);
+            });
+        
+            findingsDiv.appendChild(findingsBar);
+            findingsDiv.appendChild(findingsTable);
+            resultDiv.appendChild(findingsDiv);
+        } else {
+            const noFindingsDiv = document.createElement('p');
+            noFindingsDiv.innerText = 'Hiç bulgu bulunamadı.';
+            resultDiv.appendChild(noFindingsDiv);
+        }
+
+        document.getElementById('downloadPDF').style.display = 'block';
+    }
+
+    document.getElementById('downloadPDF').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const content = document.getElementById('result').innerText;
+        doc.text(content, 10, 10);
+
+        doc.save('sonuclar.pdf');
+    });
+</script>
+{% endblock %}
