@@ -1,0 +1,151 @@
+{% extends 'partials/_base.html'%}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <!-- LOADER -->
+
+    <!-- END LOADER -->  
+
+    <!-- Start header -->
+
+    <div class="all-title-box">
+        <div class="container text-center">
+            <h1>Contact<span class="m_1">Lorem Ipsum dolroin gravida nibh vel velit.</span></h1>
+        </div>
+    </div>
+
+    <div id="contact" class="section wb">
+        <div class="container">
+            <div class="section-title text-center">
+                <h3>Need Help? Sure we are Online!</h3>
+                <p class="lead">Let us give you more details about the special offer website you want us. Please fill out the form below. <br>We have millions of website owners who are happy to work with us!</p>
+            </div><!-- end title -->
+
+            <div class="row">
+                <div class="col-xl-6 col-md-12 col-sm-12">
+                    <div class="contact_form">
+                        <div id="message"></div>
+                        <form method="post" action="{% url 'contact_message' %}">
+                            {% csrf_token %}
+                            <div class="fields">
+                                <div class="field half">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" placeholder="Your Name" required />
+                                </div>
+                                <div class="field half">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" id="email" placeholder="Your Email" required />
+                                </div>
+                                <div class="field">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" rows="5" placeholder="Your Message" required></textarea>
+                                </div>
+                            </div>
+                            <ul class="actions">
+                                <li><button type="submit" class="button submit">Send Message</button></li>
+                            </ul>
+                        </form>
+                    </div>
+                </div><!-- end col -->
+                <div class="col-xl-6 col-md-12 col-sm-12">
+                    <div class="map-box">
+                        <div id="custom-places" class="small-map"></div>
+                    </div>
+                </div>
+            </div><!-- end row -->
+        </div><!-- end container -->
+    </div><!-- end section -->
+
+    <style>
+        .contact_form {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact_form label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .contact_form input, .contact_form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .contact_form input:focus, .contact_form textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .contact_form .button.submit {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .contact_form .button.submit:hover {
+            background-color: #0056b3;
+        }
+
+        .map-box {
+            height: 400px;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title h3 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .section-title p {
+            font-size: 18px;
+            color: #777;
+            line-height: 1.6;
+        }
+
+        .lead {
+            font-weight: normal;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .all-title-box {
+            background: #f1f1f1;
+            padding: 40px 0;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .all-title-box h1 {
+            font-size: 36px;
+            color: #333;
+        }
+
+        .m_1 {
+            font-size: 16px;
+            color: #777;
+        }
+    </style>
+
+</body>
+</html>
+{% endblock %}
