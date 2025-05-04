@@ -1,0 +1,463 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    @keyframes matrixRain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+    }
+
+    .qr-container {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff00;
+        position: relative;
+        min-height: 80vh;
+        display: flex;
+        overflow: hidden;
+        background-color: #0a0a0a;
+    }
+
+    .qr-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, 
+            rgba(0,255,0,0.05) 0%,
+            rgba(0,255,0,0.02) 50%,
+            rgba(0,255,0,0.05) 100%);
+        background-size: 100% 100%;
+        animation: matrixRain 20s linear infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        min-height: 80vh;
+        position: relative;
+        z-index: 2;
+        transition: all 0.5s ease;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .container.active {
+        min-height: 150vh;
+    }
+    
+    .main-content {
+        display: flex;
+        width: 100%;
+    }
+
+    .left-panel, .right-panel, .result-panel {
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: all 0.5s ease;
+    }
+
+    .left-panel {
+        flex: 1;
+        align-items: center;
+    }
+
+    .right-panel {
+        flex: 1;
+        background: rgba(0, 20, 0, 0.8);
+        border-left: none;
+    }
+
+    .result-panel {
+        width: 100%;
+        background: rgba(0, 20, 0, 0.9);
+        border-top: 2px solid #00ff00;
+        padding: 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.5s ease;
+        opacity: 0;
+    }
+
+    .result-panel.active {
+        max-height: 1000px;
+        opacity: 1;
+    }
+
+    .right-panel.active {
+        border-left: 2px solid #00ff00;
+    }
+
+    .title {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 10px #00ff00;
+        animation: glow 2s ease-in-out infinite alternate;
+        text-align: center;
+    }
+
+    @keyframes glow {
+        from { text-shadow: 0 0 10px #00ff00; }
+        to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+    }
+
+    .option-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        background: transparent;
+        color: #00ff00;
+        border: 2px solid #00ff00;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.2), transparent);
+        transition: 0.5s;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn:hover {
+        background: rgba(0, 255, 0, 0.1);
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+
+    #camera-section, #upload-form {
+        background: rgba(0, 20, 0, 0.6);
+        border: 1px solid #00ff00;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    #qr-reader {
+        width: 100% !important;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    #result-box {
+        background: transparent;
+        border: none;
+        padding: 0;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .terminal-output {
+        white-space: pre-wrap;
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff00;
+        line-height: 1.5;
+        overflow: hidden;
+        border-right: 2px solid #00ff00;
+        animation: typing 3.5s steps(40, end);
+    }
+
+    @keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+    }
+
+    .blinking-cursor {
+        display: inline-block;
+        width: 10px;
+        height: 20px;
+        background: #00ff00;
+        margin-left: 5px;
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .result-section {
+        background: rgba(0, 20, 0, 0.6);
+        border: 1px solid #00ff00;
+        border-radius: 5px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+
+    .result-header {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        color: #00ff00;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .result-item {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        border-left: 3px solid #00ff00;
+        background: rgba(0, 255, 0, 0.1);
+    }
+
+    .result-item.danger {
+        border-left-color: #ff0000;
+        background: rgba(255, 0, 0, 0.1);
+        color: #ff0000;
+    }
+
+    .result-item.safe {
+        border-left-color: #00ff00;
+        background: rgba(0, 255, 0, 0.1);
+        color: #00ff00;
+    }
+    
+    /* Tablo stilleri */
+    .result-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        color: #00ff00;
+    }
+    
+    .result-table th, .result-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    }
+    
+    .result-table th {
+        border-bottom: 1px solid #00ff00;
+        font-weight: bold;
+    }
+    
+    .result-status-safe {
+        color: #00ff00;
+        font-weight: bold;
+    }
+    
+    .result-status-danger {
+        color: #ff0000;
+        font-weight: bold;
+    }
+
+    .service-name {
+        font-weight: bold;
+        color: #00ff00;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .result-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px #00ff00;
+        text-align: center;
+        border-bottom: 1px solid #00ff00;
+        padding-bottom: 10px;
+    }
+</style>
+
+<div class="qr-container">
+    <div class="container">
+        <div class="main-content">
+            <div class="left-panel">
+                <h1 class="title">QR Kod Analizi</h1>
+                <div class="option-box">
+                    <button class="btn" onclick="selectMethod('camera')">📷 Kamera ile Tara</button>
+                    <button class="btn" onclick="selectMethod('upload')">🖼️ Görsel Yükle</button>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div id="camera-section" class="hidden">
+                    <div id="qr-reader"></div>
+                </div>
+                <form id="upload-form" class="hidden" enctype="multipart/form-data">
+                    <label for="qr-file" style="display: block; margin-bottom: 1rem;">QR Görseli Yükle:</label>
+                    <input type="file" id="qr-file" name="file" accept="image/*" required style="margin-bottom: 1rem; color: #00ff00;" />
+                    <button type="submit" class="btn">Analiz Et</button>
+                </form>
+            </div>
+        </div>
+        <div class="result-panel" id="result-panel">
+            <div id="result-box">
+                <h2 class="result-title">Analiz Sonuçları</h2>
+                <div id="scan-result" class="terminal-output">
+                    <p>Henüz bir şey taranmadı.</p>
+                    <span class="blinking-cursor"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    let html5QrCode;
+
+    function selectMethod(method) {
+        document.getElementById("camera-section").classList.add("hidden");
+        document.getElementById("upload-form").classList.add("hidden");
+        document.getElementById("result-panel").classList.remove("active");
+        document.querySelector(".right-panel").classList.remove("active");
+        document.querySelector(".container").classList.add("active");
+
+        if (html5QrCode) {
+            html5QrCode.stop().catch(() => {});
+        }
+
+        if (method === 'camera') {
+            document.getElementById("camera-section").classList.remove("hidden");
+            document.querySelector(".right-panel").classList.add("active");
+            startCamera();
+        } else if (method === 'upload') {
+            document.getElementById("upload-form").classList.remove("hidden");
+            document.querySelector(".right-panel").classList.add("active");
+        }
+    }
+
+    function startCamera() {
+        html5QrCode = new Html5Qrcode("qr-reader");
+        Html5Qrcode.getCameras().then(cameras => {
+            if (cameras && cameras.length) {
+                html5QrCode.start(cameras[0].id, { fps: 10, qrbox: 250 }, handleQrCode);
+            }
+        }).catch(err => {
+            showError("Kamera başlatılamadı: " + err);
+        });
+    }
+
+    function handleQrCode(decodedText) {
+        document.getElementById("result-panel").classList.add("active");
+        document.getElementById("scan-result").innerHTML = `<p>Analiz başlatılıyor...</p><span class="blinking-cursor"></span>`;
+        fetch("http://127.0.0.1:8000/scan-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: decodedText })
+        })
+        .then(response => response.json())
+        .then(data => showResult(decodedText, data))
+        .catch(err => showError("Hata oluştu: " + err));
+    }
+
+    document.getElementById("upload-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById("qr-file");
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        document.getElementById("result-panel").classList.add("active");
+        document.getElementById("scan-result").innerHTML = `<p>Dosya analiz ediliyor...</p><span class="blinking-cursor"></span>`;
+
+        fetch("http://127.0.0.1:8000/scan-qr", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => showResult(data.url || data.decoded_url, data))
+        .catch(err => showError("Hata oluştu: " + err));
+    });
+
+    function showResult(decodedUrl, data) {
+        const activeServices = Object.entries(data.bulgu_durumlari)
+            .filter(([_, value]) => value === true)
+            .map(([service]) => service);
+        
+        // Tüm servisleri almak için (aktif ve pasif)
+        const allServices = Object.keys(data.bulgu_durumlari);
+
+        const resultHtml = `
+            <div class="result-section">
+                <p class="result-header"><strong>[SERVİS SONUÇLARI]</strong></p>
+                <table class="result-table">
+                    <tr>
+                        <td style="width:30%;"><strong>URL</strong></td>
+                        <td colspan="2">${decodedUrl || 'URL bulunamadı'}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Genel Durum</strong></td>
+                        <td colspan="2">
+                            ${activeServices.length > 0 ? 
+                                '<span style="color:#ff0000; font-weight:bold;">⚠️ Zararlı İçerik Tespit Edildi</span>' : 
+                                '<span style="color:#00ff00; font-weight:bold;">✅ Güvenli</span>'}
+                        </td>
+                    </tr>
+                    <tr style="border-top:2px solid #00ff00;">
+                        <th>Servis</th>
+                        <th>Sonuç</th>
+                        <th>Açıklama</th>
+                    </tr>
+                    ${allServices.map(service => {
+                        const isActive = data.bulgu_durumlari[service];
+                        const desc = data.servis_detaylari[service]?.description || (isActive ? 'Zararlı yazılım tespit edildi' : 'Temiz');
+                        return `
+                            <tr>
+                                <td style="font-weight:bold;">${service.toUpperCase()}</td>
+                                <td>
+                                    ${isActive ? 
+                                        '<span style="color:#ff0000; font-weight:bold;">⚠️ Zararlı</span>' : 
+                                        '<span style="color:#00ff00;">✅ Temiz</span>'}
+                                </td>
+                                <td style="${isActive ? 'color:#ff0000;' : ''}">${desc}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </table>
+            </div>
+            <span class="blinking-cursor"></span>
+        `;
+
+        document.getElementById("scan-result").innerHTML = resultHtml;
+    }
+
+    function showError(message) {
+        document.getElementById("result-panel").classList.add("active");
+        document.getElementById("scan-result").innerHTML = `
+            <div class="result-section">
+                <p class="result-header"><strong>[HATA]</strong></p>
+                <p style="color: #ff0000; padding: 10px;">${message}</p>
+            </div>
+            <span class="blinking-cursor"></span>
+        `;
+    }
+</script>
+{% endblock %}

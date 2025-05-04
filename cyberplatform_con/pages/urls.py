@@ -7,7 +7,8 @@ urlpatterns = [
    path('about/',AboutView.as_view(),name="about"),
    path('ocr/', views.ocr_view, name='ocr'),
    path('contact/', views.contact_view, name='contact'),
-   path('contact_message',views.contact_message,name="contact_message")
+   path('contact_message',views.contact_message,name="contact_message"),
+   path('qr_check/',views.qrcheck_view,name="qr_check"),
 
     
 ]

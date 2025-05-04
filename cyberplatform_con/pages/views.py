@@ -31,6 +31,9 @@ class AboutView(TemplateView):
 def ocr_view(request):
     return render(request, 'ocr.html')
 
+def qrcheck_view(request):
+    return render(request, 'qr_check.html')
+
 def contact_view(request):
     return render(request, 'contact.html')
 
