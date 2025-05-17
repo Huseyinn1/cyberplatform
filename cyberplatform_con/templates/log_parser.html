@@ -1,0 +1,902 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    @keyframes matrixRain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+    }
+
+    .log-container {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff00;
+        position: relative;
+        min-height: 80vh;
+        display: flex;
+        overflow: hidden;
+        background-color: #0a0a0a;
+    }
+
+    .log-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, 
+            rgba(0,255,0,0.05) 0%,
+            rgba(0,255,0,0.02) 50%,
+            rgba(0,255,0,0.05) 100%);
+        background-size: 100% 100%;
+        animation: matrixRain 20s linear infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .dashboard {
+        width: 100%;
+        padding: 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .title {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 10px #00ff00;
+        animation: glow 2s ease-in-out infinite alternate;
+        text-align: center;
+    }
+
+    @keyframes glow {
+        from { text-shadow: 0 0 10px #00ff00; }
+        to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+    }
+
+    .upload-section {
+        background: rgba(0, 20, 0, 0.8);
+        border: 2px solid #00ff00;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .upload-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .file-input {
+        background: transparent;
+        color: #00ff00;
+        border: 2px solid #00ff00;
+        padding: 1rem;
+        border-radius: 5px;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        background: transparent;
+        color: #00ff00;
+        border: 2px solid #00ff00;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.2), transparent);
+        transition: 0.5s;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn:hover {
+        background: rgba(0, 255, 0, 0.1);
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .dashboard-card {
+        background: rgba(0, 20, 0, 0.8);
+        border: 2px solid #00ff00;
+        border-radius: 10px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: #00ff00;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-bottom: 1px solid #00ff00;
+        padding-bottom: 0.5rem;
+    }
+
+    .chart-container {
+        width: 100%;
+        height: 300px;
+        margin-top: 1rem;
+    }
+
+    .status-counts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .status-item {
+        text-align: center;
+        padding: 0.5rem;
+        border: 1px solid #00ff00;
+        border-radius: 5px;
+    }
+
+    .status-item.success {
+        color: #00ff00;
+    }
+
+    .status-item.error {
+        color: #ff0000;
+    }
+
+    .anomaly-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .anomaly-item {
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+        border-left: 3px solid #ff0000;
+        background: rgba(255, 0, 0, 0.1);
+    }
+
+    .ip-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .ip-table th, .ip-table td {
+        padding: 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    }
+
+    .ip-table th {
+        border-bottom: 1px solid #00ff00;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .sample-records {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .sample-record {
+        background: rgba(0, 20, 0, 0.8);
+        border: 1px solid #00ff00;
+        border-radius: 5px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .sample-record p {
+        margin: 0.5rem 0;
+    }
+
+    .sample-record strong {
+        color: #00ff00;
+    }
+
+    .error-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        color: #00ff00;
+    }
+
+    .error-table th,
+    .error-table td {
+        border: 1px solid #00ff00;
+        padding: 0.5rem;
+        text-align: left;
+    }
+
+    .error-table th {
+        background: rgba(0, 255, 0, 0.1);
+        font-weight: bold;
+    }
+
+    .top-errors {
+        margin-top: 1rem;
+    }
+
+    .top-errors h3 {
+        color: #00ff00;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .anomaly-card {
+        grid-column: 1 / -1;
+    }
+
+    .anomaly-table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .anomaly-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        color: #00ff00;
+    }
+
+    .anomaly-table th,
+    .anomaly-table td {
+        border: 1px solid #00ff00;
+        padding: 0.8rem;
+        text-align: left;
+    }
+
+    .anomaly-table th {
+        background: rgba(0, 255, 0, 0.1);
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .anomaly-table tbody tr {
+        background: rgba(0, 20, 0, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    .anomaly-table tbody tr:hover {
+        background: rgba(0, 255, 0, 0.1);
+    }
+
+    .anomaly-table td {
+        white-space: nowrap;
+    }
+
+    .anomaly-type {
+        font-weight: bold;
+        color: #ff0000;
+    }
+
+    .anomaly-ip {
+        color: #ffff00;
+    }
+
+    .anomaly-count {
+        color: #00ff00;
+    }
+
+    .anomaly-time {
+        color: #ff00ff;
+    }
+
+    .error-analysis-card {
+        grid-column: 1 / -1;
+    }
+
+    .error-summary {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .error-table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 1rem;
+    }
+
+    .error-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #00ff00;
+    }
+
+    .error-table th,
+    .error-table td {
+        border: 1px solid #00ff00;
+        padding: 0.8rem;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .error-table th {
+        background: rgba(0, 255, 0, 0.1);
+        font-weight: bold;
+    }
+
+    .error-table tbody tr {
+        background: rgba(0, 20, 0, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    .error-table tbody tr:hover {
+        background: rgba(0, 255, 0, 0.1);
+    }
+
+    .error-status {
+        color: #ff0000;
+        font-weight: bold;
+    }
+
+    .error-request {
+        color: #ffff00;
+    }
+
+    .error-ip {
+        color: #00ff00;
+    }
+
+    .error-time {
+        color: #ff00ff;
+    }
+</style>
+
+<div class="log-container">
+    <div class="dashboard">
+        <h1 class="title">Log Analiz Paneli</h1>
+        
+        <div class="upload-section">
+            <form id="upload-form" class="upload-form" enctype="multipart/form-data">
+                <select id="log-type-select" class="file-input" required>
+                    <option value="">Log Tipini Seçin</option>
+                    <option value="apache">Apache Log</option>
+                    <option value="syslog">Syslog</option>
+                </select>
+                <input type="file" id="log-file" name="file" accept=".log" class="file-input" required />
+                <button type="submit" class="btn">Analiz Et</button>
+            </form>
+        </div>
+
+        <div id="dashboard-content" class="hidden">
+            <div class="dashboard-grid">
+                <!-- Genel İstatistikler -->
+                <div class="dashboard-card">
+                    <h2 class="card-title">Genel İstatistikler</h2>
+                    <div id="general-stats">
+                        <p>Toplam Kayıt: <span id="total-lines">-</span></p>
+                        <p>Log Tipi: <span id="log-type">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Zaman Bazlı Analiz (Syslog için) -->
+                <div class="dashboard-card" id="time-analysis-card" style="display: none;">
+                    <h2 class="card-title">Zaman Bazlı Analiz</h2>
+                    <div class="chart-container">
+                        <canvas id="time-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Durum Kodları (Apache için) -->
+                <div class="dashboard-card" id="status-codes-card" style="display: none;">
+                    <h2 class="card-title">Durum Kodları</h2>
+                    <div class="status-counts" id="status-counts"></div>
+                    <div class="chart-container">
+                        <canvas id="status-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Program Analizi (Syslog için) -->
+                <div class="dashboard-card" id="program-analysis-card" style="display: none;">
+                    <h2 class="card-title">Program Analizi</h2>
+                    <div class="chart-container">
+                        <canvas id="program-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- IP Analizi -->
+                <div class="dashboard-card">
+                    <h2 class="card-title">IP Analizi</h2>
+                    <div class="chart-container">
+                        <canvas id="ip-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Hata Analizi (Apache için) -->
+                <div class="dashboard-card error-analysis-card" id="error-analysis-card" style="display: none;">
+                    <h2 class="card-title">Hata Analizi</h2>
+                    <div id="error-analysis">
+                        <div class="error-summary">
+                            <p>4xx Hataları: <span id="total-4xx">-</span></p>
+                            <p>5xx Hataları: <span id="total-5xx">-</span></p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="error-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Örnek Kayıtlar (Syslog için) -->
+                <div class="dashboard-card" id="sample-records-card" style="display: none;">
+                    <h2 class="card-title">Örnek Kayıtlar</h2>
+                    <div id="sample-records" class="sample-records"></div>
+                </div>
+
+                <!-- Anomali Raporu -->
+                <div class="dashboard-card anomaly-card">
+                    <h2 class="card-title">Anomali Raporu</h2>
+                    <div class="anomaly-table-container">
+                        <table class="anomaly-table" id="anomaly-table">
+                            <thead>
+                                <tr>
+                                    <th>Tip</th>
+                                    <th>IP</th>
+                                    <th>Toplam Deneme/Hata</th>
+                                    <th>Son İşlem Zamanı</th>
+                                </tr>
+                            </thead>
+                            <tbody id="anomaly-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.getElementById('upload-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    const fileInput = document.getElementById('log-file');
+    const logType = document.getElementById('log-type-select').value;
+    
+    if (!logType) {
+        alert('Lütfen log tipini seçin!');
+        return;
+    }
+    
+    formData.append('file', fileInput.files[0]);
+
+    const endpoint = logType === 'apache' ? 
+        'http://localhost:8090/analyze-apache' : 
+        'http://localhost:8090/analyze-syslog';
+
+    fetch(endpoint, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('dashboard-content').classList.remove('hidden');
+        updateDashboard(data, logType);
+    })
+    .catch(error => {
+        console.error('Hata:', error);
+        alert('Log analizi sırasında bir hata oluştu!');
+    });
+});
+
+function updateDashboard(data, logType) {
+    // Kartları göster/gizle
+    document.getElementById('status-codes-card').style.display = logType === 'apache' ? 'block' : 'none';
+    document.getElementById('error-analysis-card').style.display = logType === 'apache' ? 'block' : 'none';
+    document.getElementById('time-analysis-card').style.display = logType === 'syslog' ? 'block' : 'none';
+    document.getElementById('program-analysis-card').style.display = logType === 'syslog' ? 'block' : 'none';
+    document.getElementById('sample-records-card').style.display = logType === 'syslog' ? 'block' : 'none';
+
+    // Genel İstatistikler
+    document.getElementById('total-lines').textContent = data.toplam_kayit;
+    document.getElementById('log-type').textContent = data.log_type;
+
+    if (logType === 'apache') {
+        // Apache log analizi
+        updateApacheDashboard(data);
+    } else {
+        // Syslog analizi
+        updateSyslogDashboard(data);
+    }
+}
+
+function updateApacheDashboard(data) {
+    // Genel İstatistikler
+    document.getElementById('total-lines').textContent = data.toplam_kayit;
+    document.getElementById('log-type').textContent = data.log_type;
+
+    // Durum Kodları
+    const statusCounts = document.getElementById('status-counts');
+    statusCounts.innerHTML = '';
+    for (const [status, count] of Object.entries(data.status_counts)) {
+        const statusItem = document.createElement('div');
+        statusItem.className = `status-item ${status.startsWith('2') ? 'success' : 'error'}`;
+        statusItem.innerHTML = `<strong>${status}</strong><br>${count}`;
+        statusCounts.appendChild(statusItem);
+    }
+
+    // Durum Kodları Grafiği
+    new Chart(document.getElementById('status-chart'), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data.status_counts),
+            datasets: [{
+                data: Object.values(data.status_counts),
+                backgroundColor: [
+                    '#00ff00',
+                    '#ffff00',
+                    '#ff0000',
+                    '#ff00ff'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#00ff00'
+                    }
+                }
+            }
+        }
+    });
+
+    // Anomali Raporu
+    const anomalyList = document.getElementById('anomaly-list');
+    anomalyList.innerHTML = '';
+    if (data.anomali_raporu) {
+        data.anomali_raporu.forEach(anomaly => {
+            const tr = document.createElement('tr');
+            
+            let count = '';
+            let time = '';
+            
+            if (anomaly.tip === 'brute_force_saldirisi') {
+                count = anomaly.toplam_deneme;
+                time = anomaly.son_deneme;
+            } else if (anomaly.tip === 'yuksek_hata_orani') {
+                count = anomaly.toplam_hata;
+                time = anomaly.son_hata;
+            } else if (anomaly.tip === 'supheli_dosya_erisimi') {
+                count = anomaly.toplam_deneme;
+                time = anomaly.son_deneme;
+            }
+            
+            tr.innerHTML = `
+                <td class="anomaly-type">${anomaly.tip}</td>
+                <td class="anomaly-ip">${anomaly.ip}</td>
+                <td class="anomaly-count">${count}</td>
+                <td class="anomaly-time">${time}</td>
+            `;
+            anomalyList.appendChild(tr);
+        });
+    }
+
+    // IP Analizi
+    if (data.ip_bazli_analiz && data.ip_bazli_analiz.ip_detaylari) {
+        updateIPChart(data.ip_bazli_analiz.ip_detaylari);
+    }
+
+    // Hata Analizi
+    if (data.hata_analizi) {
+        document.getElementById('total-4xx').textContent = data.hata_analizi.total_4xx_errors;
+        document.getElementById('total-5xx').textContent = data.hata_analizi.total_5xx_errors;
+
+        // Hata Analizi Grafiği
+        new Chart(document.getElementById('error-chart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['4xx Hataları', '5xx Hataları'],
+                datasets: [{
+                    data: [
+                        data.hata_analizi.total_4xx_errors,
+                        data.hata_analizi.total_5xx_errors
+                    ],
+                    backgroundColor: ['#ffff00', '#ff0000']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#00ff00'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Top Hatalar Tablosu
+        const errorAnalysis = document.getElementById('error-analysis');
+        if (data.hata_analizi.top_errors && data.hata_analizi.top_errors.length > 0) {
+            const topErrorsDiv = document.createElement('div');
+            topErrorsDiv.className = 'error-table-container';
+            topErrorsDiv.innerHTML = '<h3>En Sık Karşılaşılan Hatalar</h3>';
+            
+            const table = document.createElement('table');
+            table.className = 'error-table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Durum</th>
+                        <th>İstek</th>
+                        <th>IP</th>
+                        <th>Zaman</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.hata_analizi.top_errors.map(error => `
+                        <tr>
+                            <td class="error-status">${error.status}</td>
+                            <td class="error-request">${error.request_line}</td>
+                            <td class="error-ip">${error.ip}</td>
+                            <td class="error-time">${error.timestamp}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            topErrorsDiv.appendChild(table);
+            errorAnalysis.appendChild(topErrorsDiv);
+        }
+    }
+
+    // Zaman Bazlı Analiz
+    if (data.zaman_bazli_analiz) {
+        const timeAnalysisCard = document.getElementById('time-analysis-card');
+        timeAnalysisCard.style.display = 'block';
+        
+        new Chart(document.getElementById('time-chart'), {
+            type: 'line',
+            data: {
+                labels: Object.keys(data.zaman_bazli_analiz),
+                datasets: [{
+                    label: 'İstek Sayısı',
+                    data: Object.values(data.zaman_bazli_analiz),
+                    borderColor: '#00ff00',
+                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#00ff00'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: '#00ff00' },
+                        grid: { color: 'rgba(0, 255, 0, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#00ff00' },
+                        grid: { color: 'rgba(0, 255, 0, 0.1)' }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function updateSyslogDashboard(data) {
+    // Zaman Bazlı Analiz
+    if (data.zaman_bazli_analiz) {
+        new Chart(document.getElementById('time-chart'), {
+            type: 'line',
+            data: {
+                labels: Object.keys(data.zaman_bazli_analiz),
+                datasets: [{
+                    label: 'Kayıt Sayısı',
+                    data: Object.values(data.zaman_bazli_analiz),
+                    borderColor: '#00ff00',
+                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#00ff00'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: '#00ff00' },
+                        grid: { color: 'rgba(0, 255, 0, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#00ff00' },
+                        grid: { color: 'rgba(0, 255, 0, 0.1)' }
+                    }
+                }
+            }
+        });
+    }
+
+    // Program Analizi
+    if (data.program_analizi) {
+        new Chart(document.getElementById('program-chart'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(data.program_analizi),
+                datasets: [{
+                    data: Object.values(data.program_analizi),
+                    backgroundColor: [
+                        '#00ff00',
+                        '#ffff00',
+                        '#ff0000',
+                        '#ff00ff'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#00ff00'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Anomali Raporu
+    const anomalyList = document.getElementById('anomaly-list');
+    anomalyList.innerHTML = '';
+    if (data.anomali_raporu) {
+        data.anomali_raporu.forEach(anomaly => {
+            const tr = document.createElement('tr');
+            
+            if (typeof anomaly === 'string') {
+                tr.innerHTML = `
+                    <td class="anomaly-type" colspan="4">${anomaly}</td>
+                `;
+            } else {
+                let count = '';
+                let time = '';
+                
+                if (anomaly.tip === 'yuksek_basarisiz_giris') {
+                    count = anomaly.toplam_deneme;
+                    time = 'N/A';
+                }
+                
+                tr.innerHTML = `
+                    <td class="anomaly-type">${anomaly.tip}</td>
+                    <td class="anomaly-ip" colspan="2">${Object.entries(anomaly.ip_detaylari)
+                        .map(([ip, count]) => `${ip}: ${count}`)
+                        .join('<br>')}</td>
+                    <td class="anomaly-time">${time}</td>
+                `;
+            }
+            anomalyList.appendChild(tr);
+        });
+    }
+
+    // IP Analizi
+    if (data.ip_bazli_analiz && data.ip_bazli_analiz.auth_ip_detaylari) {
+        updateIPChart(data.ip_bazli_analiz.auth_ip_detaylari);
+    }
+
+    // Örnek Kayıtlar
+    if (data.ornek_kayitlar) {
+        const sampleRecords = document.getElementById('sample-records');
+        sampleRecords.innerHTML = '';
+        data.ornek_kayitlar.forEach(record => {
+            const recordDiv = document.createElement('div');
+            recordDiv.className = 'sample-record';
+            recordDiv.innerHTML = `
+                <p><strong>Zaman:</strong> ${record.timestamp}</p>
+                <p><strong>Host:</strong> ${record.host}</p>
+                <p><strong>Program:</strong> ${record.program}</p>
+                <p><strong>Mesaj:</strong> ${record.message}</p>
+                ${record.user ? `<p><strong>Kullanıcı:</strong> ${record.user}</p>` : ''}
+                ${record.ip ? `<p><strong>IP:</strong> ${record.ip}</p>` : ''}
+                ${record.port ? `<p><strong>Port:</strong> ${record.port}</p>` : ''}
+            `;
+            sampleRecords.appendChild(recordDiv);
+        });
+    }
+}
+
+function updateIPChart(ipData) {
+    const ipChartData = Object.entries(ipData)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+    new Chart(document.getElementById('ip-chart'), {
+        type: 'bar',
+        data: {
+            labels: ipChartData.map(item => item[0]),
+            datasets: [{
+                label: 'İstek Sayısı',
+                data: ipChartData.map(item => item[1]),
+                backgroundColor: '#00ff00'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#00ff00'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        color: '#00ff00'
+                    },
+                    grid: {
+                        color: 'rgba(0, 255, 0, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#00ff00'
+                    },
+                    grid: {
+                        color: 'rgba(0, 255, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

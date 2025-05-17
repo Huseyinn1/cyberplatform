@@ -34,6 +34,9 @@ def ocr_view(request):
 def qrcheck_view(request):
     return render(request, 'qr_check.html')
 
+def logparser_view(request):
+    return render(request, 'log_parser.html')
+
 def contact_view(request):
     return render(request, 'contact.html')
 
