@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from blogs.models import Blog
 from django.contrib.auth.models import User
+from .models import Profile
 
 
 
@@ -81,5 +82,30 @@ def release_the_blog(request):
     user = User.objects.get(id = request.POST['user_id'])
     blog.customer.remove(user)
     return redirect('dashboard')
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        # Kullanıcı bilgilerini güncelle
+        user = request.user
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.username = request.POST.get('username')
+        user.email = request.POST.get('email')
+        user.save()
+
+        # Profil bilgilerini güncelle
+        profile = user.profile
+        if 'avatar' in request.FILES:
+            profile.avatar = request.FILES['avatar']
+        profile.bio = request.POST.get('bio')
+        profile.phone = request.POST.get('phone')
+        profile.address = request.POST.get('address')
+        profile.save()
+
+        messages.success(request, 'Profiliniz başarıyla güncellendi.')
+        return redirect('dashboard')
+    
+    return render(request, 'edit_profile.html')
 
     

@@ -5,58 +5,118 @@
 		
 	<div class="all-title-box">
 		<div class="container text-center">
-			<h1>{{ user.username }}</span></h1>
+			<h1>{{ user.username }}</h1>
 		</div>
 	</div>
 	
     <div id="overviews" class="section wb">
         <div class="container">
             <div class="row"> 
-                <div class="col-lg-12 blog-post-single">
-					
-					<div class="blog-author">
-						<div class="author-bio">
-							<h2 class="author_name">{{ user.first_name }} {{ user.last_name }}</h3>
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                     alt="Profil Resmi" 
+                                     class="rounded-circle" 
+                                     style="width: 150px; height: 150px; object-fit: cover;">
+                            </div>
+                            <h3 class="card-title text-center">{{ user.first_name }} {{ user.last_name }}</h3>
+                            <p class="text-muted text-center">@{{ user.username }}</p>
+                            <hr>
+                            <div class="profile-info">
+                                <p><i class="fa fa-envelope me-2"></i> {{ user.email }}</p>
+                                <p><i class="fa fa-calendar me-2"></i> Üyelik Tarihi: {{ user.date_joined|date:"d M Y" }}</p>
+                                <p><i class="fa fa-clock me-2"></i> Son Giriş: {{ user.last_login|date:"d M Y H:i" }}</p>
+                                {% if user.profile.bio %}
+                                <p><i class="fa fa-user me-2"></i> {{ user.profile.bio }}</p>
+                                {% endif %}
+                                {% if user.profile.phone %}
+                                <p><i class="fa fa-phone me-2"></i> {{ user.profile.phone }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="text-center mt-4">
+                                <a href="{% url 'edit_profile' %}" class="btn btn-primary">Profili Düzenle</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-						</div>
-					</div>
-					
-					
-                </div><!-- end col -->
-            </div><!-- end row -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h2 class="card-title mb-4">Blog İstatistikleri</h2>
+                            <div class="row text-center">
+                                <div class="col-md-4">
+                                    <div class="stat-box p-3">
+                                        <h3>{{ blogs|length }}</h3>
+                                        <p class="text-muted">Toplam Blog</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-box p-3">
+                                        <h3>{{ user.date_joined|timesince }}</h3>
+                                        <p class="text-muted">Üyelik Süresi</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-box p-3">
+                                        <h3>{{ user.last_login|timesince }}</h3>
+                                        <p class="text-muted">Son Aktiflik</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <div class="row"> 
+            <div class="row mt-5"> 
                 <div class="col-lg-12">
-                    <h2 class="text-center my-5">Blogs Enrolled By {{ user.username  }}</h2>
+                    <h2 class="text-center mb-4">Kayıtlı Olduğunuz Bloglar</h2>
                 </div>
                 {% for blog in blogs %}
-
-                <div class="col-lg-4 col-md-6 col-12">
-                    <div class="course-item">
-						<div class="image-blog">
-							<img src="{{blog.image.url}}" alt="" class="img-fluid">
-						</div>
-						<div class="course-br">
-							<div class="course-title">
-								<h2><a href="{% url 'blog_detail' blog.category.slug blog.id %}" title="">{{blog.name}}</a></h2>
-							</div>
-							<div class="course-desc">
-								<p>{{blog.description | truncatechars:140}}</p>
-							</div>
-						</div>
-						<div class="course-meta-bot">
-							<ul>
-								<li><i class="fa fa-calendar" aria-hidden="true"></i> {{blog.date|date:"d M Y"}}</li>
-
-							</ul>
-						</div>
-					</div>
-                    <br>
-                </div><!-- end col -->
-
+                <div class="col-lg-4 col-md-6 col-12 mb-4">
+                    <div class="course-item shadow-sm">
+                        <div class="image-blog">
+                            <img src="{{blog.image.url}}" alt="" class="img-fluid">
+                        </div>
+                        <div class="course-br">
+                            <div class="course-title">
+                                <h2><a href="{% url 'blog_detail' blog.category.slug blog.id %}" title="">{{blog.name}}</a></h2>
+                            </div>
+                            <div class="course-desc">
+                                <p>{{blog.description | truncatechars:140}}</p>
+                            </div>
+                        </div>
+                        <div class="course-meta-bot">
+                            <ul>
+                                <li><i class="fa fa-calendar" aria-hidden="true"></i> {{blog.date|date:"d M Y"}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
-            </div><!-- end row -->	
-        </div><!-- end container -->
-    </div><!-- end section -->
+            </div>
+        </div>
+    </div>
 
-    {% endblock %}
+    <style>
+        .stat-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        .profile-info p {
+            margin-bottom: 10px;
+        }
+        .profile-info i {
+            width: 20px;
+            color: #007bff;
+        }
+    </style>
+
+{% endblock %}
