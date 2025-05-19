@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Blog,Category,Tag
+from .models import Blog,Category,Tag,Comment
 
 
 
@@ -16,3 +16,11 @@ class Category(admin.ModelAdmin):
 @admin.register(Tag)
 class Category(admin.ModelAdmin):
         prepopulated_fields = {'slug':('name',)}
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+        list_display = ('user','blog','content','created_at')
+        list_filter = ('created_at','user','blog')
+        search_fields = ('content','user__username','blog__name')
+        date_hierarchy = 'created_at'
+        ordering = ('-created_at',)

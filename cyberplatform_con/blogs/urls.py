@@ -7,4 +7,6 @@ urlpatterns = [
    path('categories/<slug:category_slug>',views.category_list,name="blogs_by_category"),
    path('tags/<slug:tag_slug>',views.tag_list,name="blogs_by_tag"),
    path('search/',views.search,name="search"),
+   path('<int:blog_id>/add-comment/', views.add_comment, name='add_comment'),
+   path('<int:blog_id>/comments/', views.get_comments, name='get_comments'),
 ]
