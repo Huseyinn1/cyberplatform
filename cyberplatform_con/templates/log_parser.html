@@ -492,6 +492,9 @@
 document.getElementById('upload-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    // Önceki sonuçları temizle
+    clearPreviousResults();
+    
     const formData = new FormData();
     const fileInput = document.getElementById('log-file');
     const logType = document.getElementById('log-type-select').value;
@@ -539,6 +542,37 @@ document.getElementById('upload-form').addEventListener('submit', function(e) {
         alert('Log analizi sırasında bir hata oluştu!');
     });
 });
+
+// Önceki sonuçları temizleme fonksiyonu
+function clearPreviousResults() {
+    // Tüm grafikleri temizle
+    const chartIds = ['time-chart', 'status-chart', 'program-chart', 'ip-chart', 'error-chart'];
+    chartIds.forEach(id => {
+        const canvas = document.getElementById(id);
+        if (canvas) {
+            const chart = Chart.getChart(canvas);
+            if (chart) {
+                chart.destroy();
+            }
+        }
+    });
+
+    // Tüm tabloları ve içerikleri temizle
+    document.getElementById('status-counts').innerHTML = '';
+    document.getElementById('anomaly-list').innerHTML = '';
+    document.getElementById('sample-records').innerHTML = '';
+    
+    // Genel istatistikleri sıfırla
+    document.getElementById('total-lines').textContent = '-';
+    document.getElementById('log-type').textContent = '-';
+    
+    // Hata analizi sonuçlarını sıfırla
+    document.getElementById('total-4xx').textContent = '-';
+    document.getElementById('total-5xx').textContent = '-';
+    
+    // Dashboard'u gizle
+    document.getElementById('dashboard-content').classList.add('hidden');
+}
 
 function updateDashboard(data, logType) {
     // Kartları göster/gizle
