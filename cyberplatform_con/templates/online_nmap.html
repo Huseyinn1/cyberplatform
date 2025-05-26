@@ -1,0 +1,924 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="cyber-background">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card cyber-card">
+                    <div class="card-header cyber-header">
+                        <h3 class="mb-0"><i class="fas fa-shield-alt"></i> Online Nmap Tarama</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="nmapForm">
+                            <div class="form-group mb-4">
+                                <label for="ipAddress" class="form-label">Hedef IP Adresi</label>
+                                <div class="input-group">
+                                    <span class="input-group-text cyber-input-group"><i class="fas fa-network-wired"></i></span>
+                                    <input type="text" class="form-control cyber-input" id="ipAddress" placeholder="Örn: 127.0.0.1" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="timing" class="form-label">Tarama Hızı</label>
+                                <div class="input-group">
+                                    <span class="input-group-text cyber-input-group"><i class="fas fa-tachometer-alt"></i></span>
+                                    <select class="form-select cyber-input" id="timing">
+                                        <option value="T3" selected>Orta Hız (T3)</option>
+                                        <option value="T0">Çok Yavaş (T0)</option>
+                                        <option value="T1">Yavaş (T1)</option>
+                                        <option value="T2">Normal (T2)</option>
+                                        <option value="T4">Hızlı (T4)</option>
+                                        <option value="T5">Çok Hızlı (T5)</option>
+                                    </select>
+                                </div>
+                                <small class="text-muted mt-2 d-block">Tarama hızını seçin. Daha hızlı taramalar daha agresif olabilir.</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Tarama Tipleri</label>
+                                <div class="scan-types-grid">
+                                    <div class="scan-type-card" data-type="port-scan">
+                                        <div class="card-title">Port Scan</div>
+                                        <div class="tooltip">Özel port aralığı belirterek detaylı port taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="discovery">
+                                        <div class="card-title">Discovery</div>
+                                        <div class="tooltip">Hedef sistemin varlığını kontrol eder (-sn parametresi ile).</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="os">
+                                        <div class="card-title">OS</div>
+                                        <div class="tooltip">İşletim sistemi tespiti yapar (-O parametresi ile).</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="light">
+                                        <div class="card-title">Light</div>
+                                        <div class="tooltip">Temel portlar üzerinde hızlı servis versiyon taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="medium">
+                                        <div class="card-title">Medium</div>
+                                        <div class="tooltip">Genişletilmiş port aralığında servis versiyon taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="heavy">
+                                        <div class="card-title">Heavy</div>
+                                        <div class="tooltip">Tüm portlar üzerinde detaylı servis versiyon taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="vuln-light">
+                                        <div class="card-title">Vuln Light</div>
+                                        <div class="tooltip">Temel portlarda güvenlik açığı taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="vuln-medium">
+                                        <div class="card-title">Vuln Medium</div>
+                                        <div class="tooltip">Genişletilmiş port aralığında güvenlik açığı taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="vuln-heavy">
+                                        <div class="card-title">Vuln Heavy</div>
+                                        <div class="tooltip">Tüm portlarda kapsamlı güvenlik açığı taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="web">
+                                        <div class="card-title">Web</div>
+                                        <div class="tooltip">Web servisleri üzerinde HTTP tabanlı taramalar yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="db">
+                                        <div class="card-title">DB</div>
+                                        <div class="tooltip">Veritabanı servisleri üzerinde özel taramalar yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="full">
+                                        <div class="card-title">Full</div>
+                                        <div class="tooltip">Kapsamlı tarama: OS, servis, güvenlik açığı ve DNS taraması.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="security">
+                                        <div class="card-title">Security</div>
+                                        <div class="tooltip">Temel güvenlik taraması ve kimlik doğrulama kontrolü yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="service-version">
+                                        <div class="card-title">Service Version</div>
+                                        <div class="tooltip">Tüm portlarda detaylı servis versiyon taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="ssl">
+                                        <div class="card-title">SSL</div>
+                                        <div class="tooltip">SSL/TLS servisleri üzerinde güvenlik taraması yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="dns">
+                                        <div class="card-title">DNS</div>
+                                        <div class="tooltip">DNS servisleri üzerinde özel taramalar yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="smtp">
+                                        <div class="card-title">SMTP</div>
+                                        <div class="tooltip">SMTP servisleri üzerinde özel taramalar yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="ftp">
+                                        <div class="card-title">FTP</div>
+                                        <div class="tooltip">FTP servisleri üzerinde özel taramalar yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="smb">
+                                        <div class="card-title">SMB</div>
+                                        <div class="tooltip">SMB servisleri üzerinde özel taramalar yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="quick">
+                                        <div class="card-title">Quick</div>
+                                        <div class="tooltip">En yaygın 100 port üzerinde hızlı tarama yapar.</div>
+                                    </div>
+                                    <div class="scan-type-card" data-type="full-security">
+                                        <div class="card-title">Full Security</div>
+                                        <div class="tooltip">Tüm portlarda kapsamlı güvenlik ve keşif taraması yapar.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Port Aralığı Girişi -->
+                            <div id="portRangeInput" class="mt-3" style="display: none;">
+                                <div class="card cyber-card">
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label class="form-label">Port Aralığı</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control cyber-input" id="portRange" placeholder="Örn: 1-1000 veya 80,443,8080">
+                                                <button class="btn cyber-btn" type="button" id="applyPortRange">
+                                                    <i class="fas fa-check"></i> Uygula
+                                                </button>
+                                            </div>
+                                            <small class="text-muted mt-2 d-block">Port aralığını belirtin (örn: 1-1000) veya virgülle ayırarak tek portlar girin (örn: 80,443,8080)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3">
+                                <button type="button" class="btn cyber-btn" id="scanBtn">
+                                    <i class="fas fa-search"></i> Tarama Yap
+                                </button>
+                                <button type="button" class="btn cyber-btn" id="scanAndExportBtn">
+                                    <i class="fas fa-file-pdf"></i> Tara ve PDF Oluştur
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="results" class="mt-4" style="display: none;">
+                            <div class="card cyber-card">
+                                <div class="card-header cyber-header">
+                                    <h4 class="mb-0">Tarama Sonuçları</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="resultsContent"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="loading" class="mt-4" style="display: none;">
+                            <div class="card cyber-card">
+                                <div class="card-body text-center">
+                                    <div class="cyber-loader">
+                                        <div class="loader-content">
+                                            <div class="loader-circle"></div>
+                                            <div class="loader-text">Tarama Yapılıyor...</div>
+                                            <div class="loader-subtext">Bu işlem birkaç dakika sürebilir</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.cyber-background {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(90deg, rgba(255,0,0,0.03) 1px, transparent 1px) 0 0 / 50px 50px,
+        linear-gradient(rgba(255,0,0,0.03) 1px, transparent 1px) 0 0 / 50px 50px;
+    animation: cyber-grid 20s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes cyber-grid {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(50px);
+    }
+}
+
+.cyber-card {
+    background: rgba(26, 26, 46, 0.95);
+    border: 1px solid #dc3545;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.cyber-header {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.cyber-header h3 {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+    font-weight: 600;
+}
+
+.cyber-input-group {
+    background: #1a1a2e;
+    border: 1px solid #dc3545;
+    border-right: none;
+    color: #dc3545;
+}
+
+.cyber-input {
+    background: #1a1a2e !important;
+    border: 1px solid #dc3545 !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.cyber-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    border-color: #ff4d5d !important;
+}
+
+.cyber-btn {
+    background: linear-gradient(45deg, #1a1a2e, #2a2a4a);
+    border: 1px solid #dc3545;
+    padding: 0.85rem 1.75rem;
+    font-weight: 500;
+    color: #fff;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.cyber-btn i {
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.cyber-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(220, 53, 69, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.cyber-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    border-color: #ff4d5d;
+    background: linear-gradient(45deg, #2a2a4a, #1a1a2e);
+}
+
+.cyber-btn:hover::before {
+    left: 100%;
+}
+
+.cyber-btn:hover i {
+    transform: scale(1.1);
+    color: #ff4d5d;
+}
+
+.cyber-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+}
+
+/* Buton container için yeni stil */
+.button-container {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: rgba(26, 26, 46, 0.3);
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+}
+
+.scan-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+    padding: 0.75rem;
+}
+
+.scan-type-card {
+    background: linear-gradient(145deg, #1a1a2e, #2a2a4a);
+    border: 1px solid #dc3545;
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: visible;
+    backdrop-filter: blur(5px);
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scan-type-card .card-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+    transition: all 0.3s ease;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scan-type-card .tooltip {
+    visibility: hidden;
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 26, 46, 0.95);
+    color: #fff;
+    text-align: center;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #dc3545;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    width: max-content;
+    max-width: 250px;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.scan-type-card .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #dc3545 transparent transparent transparent;
+}
+
+.scan-type-card:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+    bottom: 130%;
+}
+
+.scan-type-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
+    border-color: #ff4d5d;
+}
+
+.scan-type-card.selected {
+    background: linear-gradient(145deg, #dc3545, #c82333);
+    border-color: #ff4d5d;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+.scan-type-card.selected .card-title {
+    color: #fff;
+    font-weight: 600;
+}
+
+#results table {
+    color: #fff;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(26, 26, 46, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#results .table-dark {
+    background-color: transparent;
+}
+
+#results .table-dark th {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    border-color: #dc3545;
+    padding: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#results .table-dark td {
+    border-color: rgba(220, 53, 69, 0.2);
+    padding: 0.75rem 1rem;
+    background: rgba(26, 26, 46, 0.5);
+}
+
+#results .table-dark tr:hover td {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.form-label {
+    color: #fff;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+/* Animasyonlu arka plan efekti */
+@keyframes cyber-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+.cyber-card {
+    animation: cyber-pulse 2s infinite;
+}
+
+.scan-info {
+    background: rgba(26, 26, 46, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.info-item {
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-item strong {
+    color: #dc3545;
+    margin-right: 0.5rem;
+}
+
+.info-item span {
+    color: #fff;
+    font-weight: 400;
+}
+
+.cyber-loader {
+    padding: 2rem;
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.loader-circle {
+    width: 60px;
+    height: 60px;
+    border: 3px solid #dc3545;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    position: relative;
+}
+
+.loader-circle::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 3px solid transparent;
+    border-top: 3px solid #dc3545;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+}
+
+.loader-circle::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid transparent;
+    border-top: 3px solid #dc3545;
+    border-radius: 50%;
+    animation: spin 3s linear infinite;
+}
+
+.loader-text {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loader-subtext {
+    color: #dc3545;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.6;
+    }
+}
+
+.port-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.port-status.open {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.port-status.closed {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.port-status.filtered {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.port-status.unfiltered {
+    background-color: rgba(23, 162, 184, 0.2);
+    color: #17a2b8;
+    border: 1px solid rgba(23, 162, 184, 0.3);
+}
+
+.port-status.open|filtered {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.port-status.closed|filtered {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.scan-type-card.has-port-range {
+    border-color: #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+.scan-type-card.has-port-range::after {
+    display: none;
+}
+
+#portRangeInput .cyber-card {
+    background: rgba(26, 26, 46, 0.7);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+#portRangeInput .form-label {
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+#portRangeInput .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+#portRangeInput .input-group {
+    margin-bottom: 0.5rem;
+}
+
+#portRangeInput .cyber-btn {
+    padding: 0.5rem 1rem;
+    min-width: auto;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+#portRangeInput .cyber-btn.clicked {
+    transform: scale(0.95);
+    background: linear-gradient(45deg, #28a745, #218838);
+    border-color: #28a745;
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transform: translateX(150%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.success-message.show {
+    transform: translateX(0);
+}
+
+.success-message i {
+    margin-right: 8px;
+    animation: bounce 0.5s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.form-select.cyber-input {
+    background: #1a1a2e !important;
+    border: 1px solid #dc3545 !important;
+    color: #fff !important;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.form-select.cyber-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    border-color: #ff4d5d !important;
+}
+
+.form-select.cyber-input option {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 0.5rem;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scanTypes = document.querySelectorAll('.scan-type-card');
+    const scanBtn = document.getElementById('scanBtn');
+    const scanAndExportBtn = document.getElementById('scanAndExportBtn');
+    const results = document.getElementById('results');
+    const resultsContent = document.getElementById('resultsContent');
+    const portRangeInput = document.getElementById('portRangeInput');
+    const portRange = document.getElementById('portRange');
+    const applyPortRange = document.getElementById('applyPortRange');
+
+    let selectedPortRange = '';
+
+    scanTypes.forEach(card => {
+        card.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            
+            // Port taraması seçildiğinde port aralığı girişini göster
+            if (this.dataset.type === 'port-scan') {
+                if (this.classList.contains('selected')) {
+                    portRangeInput.style.display = 'block';
+                } else {
+                    portRangeInput.style.display = 'none';
+                    selectedPortRange = '';
+                }
+            }
+        });
+    });
+
+    applyPortRange.addEventListener('click', function() {
+        const button = this;
+        selectedPortRange = portRange.value.trim();
+        if (selectedPortRange) {
+            // Port aralığı formatını kontrol et
+            const isValidFormat = /^(\d+-\d+|\d+(,\d+)*)$/.test(selectedPortRange);
+            if (!isValidFormat) {
+                alert('Geçersiz port aralığı formatı! Örnek: 1-1000 veya 80,443,8080');
+                return;
+            }
+
+            // Buton animasyonu
+            button.classList.add('clicked');
+            setTimeout(() => {
+                button.classList.remove('clicked');
+            }, 200);
+        }
+    });
+
+    function getSelectedScanTypes() {
+        return Array.from(document.querySelectorAll('.scan-type-card.selected'))
+            .map(card => card.dataset.type);
+    }
+
+    function displayResults(data) {
+        let html = '';
+        
+        for (const [scanType, scanData] of Object.entries(data)) {
+            html += `
+                <div class="mb-4">
+                    <h5 class="text-danger">${scanType.toUpperCase()} Taraması</h5>
+                    <div class="scan-info">
+                        <div class="info-item"><strong>Host:</strong> <span>${scanData.host}</span></div>
+                        <div class="info-item"><strong>IP:</strong> <span>${scanData.ip}</span></div>
+                        <div class="info-item"><strong>Durum:</strong> <span>${scanData.status}</span></div>
+                        ${scanData.os ? `<div class="info-item"><strong>İşletim Sistemi:</strong> <span>${scanData.os}</span></div>` : ''}
+                    </div>
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Port</th>
+                                <th>Durum</th>
+                                <th>Servis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scanData.ports.map(port => `
+                                <tr>
+                                    <td>${port.port}</td>
+                                    <td><span class="port-status ${port.state.toLowerCase()}">${port.state}</span></td>
+                                    <td>${port.service}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        resultsContent.innerHTML = html;
+        results.style.display = 'block';
+    }
+
+    async function performScan(endpoint) {
+        const ip = document.getElementById('ipAddress').value;
+        const selectedTypes = getSelectedScanTypes();
+        const timing = document.getElementById('timing').value;
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+
+        if (!ip) {
+            alert('Lütfen bir IP adresi girin!');
+            return;
+        }
+
+        if (selectedTypes.length === 0) {
+            alert('Lütfen en az bir tarama tipi seçin!');
+            return;
+        }
+
+        // Port taraması seçiliyse ve port aralığı girilmemişse uyarı ver
+        if (selectedTypes.includes('port-scan') && !selectedPortRange) {
+            alert('Port taraması için port aralığı belirtmelisiniz!');
+            return;
+        }
+
+        try {
+            loading.style.display = 'block';
+            results.style.display = 'none';
+
+            const requestBody = {
+                ip: ip,
+                scan_types: selectedTypes,
+                timing: timing
+            };
+
+            // Port taraması seçiliyse port aralığını ekle
+            if (selectedTypes.includes('port-scan')) {
+                requestBody.port_range = selectedPortRange;
+            }
+
+            const response = await fetch(`http://127.0.0.1:1907${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type'
+                },
+                mode: 'cors',
+                credentials: 'include',
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            loading.style.display = 'none';
+            
+            if (endpoint === '/nmap/scan-and-export') {
+                if (data.pdf_base64) {
+                    const pdfBlob = base64ToBlob(data.pdf_base64, 'application/pdf');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    
+                    const link = document.createElement('a');
+                    link.href = pdfUrl;
+                    link.download = `nmap_scan_${data.scan_id}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(pdfUrl);
+                }
+                if (data.scan_results) {
+                    displayResults(data.scan_results);
+                }
+            } else {
+                displayResults(data);
+            }
+        } catch (error) {
+            loading.style.display = 'none';
+            alert('Tarama sırasında bir hata oluştu: ' + error.message);
+        }
+    }
+
+    function base64ToBlob(base64, type = 'application/pdf') {
+        const binaryString = window.atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return new Blob([bytes], { type: type });
+    }
+
+    scanBtn.addEventListener('click', () => performScan('/nmap/scan'));
+    scanAndExportBtn.addEventListener('click', () => performScan('/nmap/scan-and-export'));
+});
+</script>
+{% endblock %}

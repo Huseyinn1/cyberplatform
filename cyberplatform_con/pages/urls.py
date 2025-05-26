@@ -9,5 +9,6 @@ urlpatterns = [
    path('contact/', views.contact_view, name='contact'),
    path('contact_message',views.contact_message,name="contact_message"),
    path('qr_check/',views.qrcheck_view,name="qr_check"),
-   path('log_parser/',views.logparser_view,name="log_parser") 
+   path('log_parser/',views.logparser_view,name="log_parser"),
+   path('online_nmap/',views.onlinenmap_view,name="online_nmap")
 ]

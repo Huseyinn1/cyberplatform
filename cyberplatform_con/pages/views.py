@@ -36,6 +36,8 @@ def qrcheck_view(request):
 
 def logparser_view(request):
     return render(request, 'log_parser.html')
+def onlinenmap_view(request):
+    return render(request, 'online_nmap.html')
 
 def contact_view(request):
     return render(request, 'contact.html')
