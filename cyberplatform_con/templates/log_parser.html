@@ -395,7 +395,7 @@
                     <option value="firewall">Firewall Log</option>
                     <option value="windows">Windows Event Log</option>
                 </select>
-                <input type="file" id="log-file" name="file" accept=".log" class="file-input" required />
+                <input type="file" id="log-file" name="file" class="file-input" required />
                 <button type="submit" class="btn">Analiz Et</button>
             </form>
         </div>
@@ -621,7 +621,7 @@ function updateApacheDashboard(data) {
     for (const [status, count] of Object.entries(data.status_counts)) {
         const statusItem = document.createElement('div');
         statusItem.className = `status-item ${status.startsWith('2') ? 'success' : 'error'}`;
-        statusItem.innerHTML = `<strong>${status}</strong><br>${count}`;
+        statusItem.innerHTML = `<strong>Status ${status}</strong><br>${count}`;
         statusCounts.appendChild(statusItem);
     }
 
