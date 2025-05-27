@@ -38,6 +38,9 @@ def logparser_view(request):
     return render(request, 'log_parser.html')
 def onlinenmap_view(request):
     return render(request, 'online_nmap.html')
+def usom_view(request):
+    return render(request, 'usom.html')
+
 
 def contact_view(request):
     return render(request, 'contact.html')

@@ -1,0 +1,412 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-12">
+            <div class="content-wrapper">
+                <!-- Ortalanmış büyük başlık -->
+                <div class="text-center mb-4">
+                    <h1 class="usom-title">USOM Zararlı Bağlantılar</h1>
+                </div>
+                <!-- Sadece arama çubuğu -->
+                <div class="d-flex justify-content-center mb-3">
+                    <form class="search-form-simple d-flex flex-row align-items-center w-100 justify-content-center" id="searchForm" onsubmit="return false;">
+                        <div class="input-group search-input-group-simple flex-grow-1" style="max-width: 600px;">
+                            <span class="input-group-text bg-dark text-warning border-warning"><i class="fas fa-search"></i></span>
+                            <input type="text" id="searchInput" class="form-control bg-dark text-light border-warning search-input-custom" placeholder="Arama">
+                        </div>
+                    </form>
+                </div>
+                <div class="text-muted mt-2 mb-2" style="font-size:1.1rem;">
+                    <b id="totalCount">0</b> sonuç listeleniyor.
+                </div>
+                <div class="card bg-dark text-light">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Adres</th>
+                                        <th>Tarih</th>
+                                        <th>Açıklama</th>
+                                        <th>Kaynak</th>
+                                        <th>Detay</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="iocTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Sayfalama">
+                            <ul class="pagination justify-content-center" id="pagination">
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detay Modalı -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title text-dark" id="detailModalLabel">Detaylar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body bg-light text-dark" id="modalDetailBody">
+        <!-- Dinamik içerik buraya gelecek -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentPage = 1;
+const itemsPerPage = 10;
+let allData = [];
+let filteredData = [];
+let searchTimeout;
+
+// Açıklama verileri
+const descMap = {
+    "BP": {
+        tr_title: "Bankacılık - Oltalama",
+        tr_desc: "Finsans sektörüne özel olarak gerçekleştirilen sosyal mühendislik saldırılarına yönelik zararlı alan adı, IP adresi veya bağlantıların bulunduğu kategoridir."
+    },
+    "PH": {
+        tr_title: "Oltalama",
+        tr_desc: "Finans sektörünün dışındaki sosyal mühendislik saldırılarına yönelik zararlı alan adı, IP adresi veya bağlantıların bulunduğu kategoridir."
+    },
+    "MD": {
+        tr_title: "Zararlı Yazılım Barındıran / Yayan Alan Adı",
+        tr_desc: "Zararlı yazılımların çalışması için bir bölümünün veya tamamının indirildiği alan adlarına ait kategoridir."
+    },
+    "AC": { tr_title: "Apt C&C", tr_desc: "" },
+    "BC": { tr_title: "Botnet C&C", tr_desc: "" },
+    "EK": { tr_title: "Exploit Kit", tr_desc: "" },
+    "MC": { tr_title: "Mobil C&C", tr_desc: "" },
+    "MF": { tr_title: "Zararlı Dosya İndirme", tr_desc: "" },
+    "MM": { tr_title: "Mining Zararlısı", tr_desc: "" },
+    "OT": { tr_title: "Diğer", tr_desc: "" }
+};
+const sourceMap = {
+    "US": "USOM",
+    "SO": "SOME",
+    "RS": "RSA",
+    "IH": "İHBAR"
+};
+const connectionTypeMap = {
+    "PH": "Oltalama",
+    "MD": "Zararlı Yazılım",
+    "AC": "Apt C&C",
+    "BC": "Botnet C&C",
+    "EK": "Exploit Kit",
+    "MC": "Mobil C&C",
+    "MF": "Zararlı Dosya İndirme",
+    "MM": "Mining Zararlısı",
+    "OT": "Diğer"
+};
+
+function fetchData() {
+    fetch('http://localhost:1905/usom/db')
+        .then(response => response.json())
+        .then(data => {
+            allData = data;
+            filterAndDisplay();
+        })
+        .catch(error => console.error('Veri çekme hatası:', error));
+}
+
+function filterAndDisplay() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+    filteredData = allData.filter(item => {
+        let matchesSearch = (
+            item.address.toLowerCase().includes(searchTerm) ||
+            (descMap[item.desc]?.tr_title || item.desc).toLowerCase().includes(searchTerm) ||
+            (sourceMap[item.source] || item.source).toLowerCase().includes(searchTerm) ||
+            (connectionTypeMap[item.connectiontype] || item.connectiontype).toLowerCase().includes(searchTerm)
+        );
+        return matchesSearch;
+    });
+    document.getElementById('totalCount').textContent = filteredData.length;
+    displayData();
+}
+
+function displayData() {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+
+    const tableBody = document.getElementById('iocTableBody');
+    tableBody.innerHTML = '';
+
+    if (filteredData.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="5" class="text-center text-warning">
+                <i class="fas fa-search"></i> Sonuç bulunamadı
+            </td>
+        `;
+        tableBody.appendChild(row);
+    } else {
+        paginatedData.forEach((item, idx) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.address}</td>
+                <td>${new Date(item.date).toLocaleString('tr-TR')}</td>
+                <td>${descMap[item.desc]?.tr_title || item.desc}</td>
+                <td>${sourceMap[item.source] || item.source}</td>
+                <td><button class="btn btn-sm btn-warning" onclick="showDetailModal(${allData.indexOf(item)})">Detay</button></td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+    updatePagination(filteredData.length);
+}
+
+function updatePagination(totalItems) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    if (totalPages > 1) {
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Önceki</a>`;
+        pagination.appendChild(prevLi);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+            pagination.appendChild(li);
+        }
+
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sonraki</a>`;
+        pagination.appendChild(nextLi);
+    }
+}
+
+function changePage(page) {
+    currentPage = page;
+    displayData();
+}
+
+// Dinamik arama için event listener
+document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    currentPage = 1;
+    searchTimeout = setTimeout(() => {
+        filterAndDisplay();
+    }, 300);
+});
+
+document.getElementById('searchForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    currentPage = 1;
+    filterAndDisplay();
+});
+
+// Detay modalı fonksiyonu
+document.showDetailModal = function(index) {
+    const item = allData[index];
+    const desc = descMap[item.desc] || {tr_title: item.desc, tr_desc: ''};
+    const source = sourceMap[item.source] || item.source;
+    const connectionType = connectionTypeMap[item.connectiontype] || item.connectiontype;
+    const modalBody = document.getElementById('modalDetailBody');
+    modalBody.innerHTML = `
+        <h3 class="text-warning mb-2">${item.address}</h3>
+        <div class="mb-2"><span class="badge bg-secondary">${desc.tr_title}</span></div>
+        <div class="row align-items-center">
+            <div class="col-md-5 mb-3 mb-md-0">
+                <div class="bg-warning text-dark p-4 rounded shadow-sm text-center">
+                    <div class="fw-bold mb-2">Kritiklik Seviyesi</div>
+                    <div style="font-size:3rem;font-weight:700;">${item.criticality_level}/10</div>
+                    <div style="font-size:0.9rem;">1 En Düşük - 10 En Yüksek</div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <ul class="list-unstyled mb-2">
+                    <li><b>Açıklama:</b> ${desc.tr_title}</li>
+                    <li><b>Bağlantı Türü:</b> ${connectionType}</li>
+                    <li><b>Tarih:</b> ${new Date(item.date).toLocaleString('tr-TR')}</li>
+                    <li><b>Kaynak:</b> ${source}</li>
+                </ul>
+                <div class="text-muted" style="font-size:0.95rem;">${desc.tr_desc}</div>
+            </div>
+        </div>
+    `;
+    var modal = new bootstrap.Modal(document.getElementById('detailModal'));
+    modal.show();
+}
+
+// Sayfa yüklendiğinde verileri çek
+fetchData();
+setInterval(fetchData, 300000);
+</script>
+
+<style>
+body {
+    background-color: #1a1a1a;
+    margin: 0;
+    padding: 0;
+}
+
+.usom-title {
+    font-size: 2.7rem;
+    font-weight: 700;
+    color: #ffc107;
+    letter-spacing: 1px;
+    text-shadow: 0 0 12px rgba(255,193,7,0.25);
+    margin-bottom: 0.5rem;
+}
+
+.search-form-simple {
+    background: #23272b;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 12px rgba(255,193,7,0.08);
+    padding: 1rem 2rem;
+    width: 100%;
+    max-width: 700px;
+}
+
+.search-input-group-simple {
+    min-width: 220px;
+    max-width: 600px;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.search-input-custom {
+    border-radius: 0 1rem 1rem 0 !important;
+    font-size: 1.1rem;
+    height: 48px;
+    background: #23272b !important;
+    color: #ffc107 !important;
+    border: 2px solid #ffc107 !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s;
+}
+
+.search-input-custom:focus {
+    border-color: #ffea00 !important;
+    outline: none !important;
+    background: #23272b !important;
+    color: #ffc107 !important;
+}
+
+.search-input-group-simple .input-group-text {
+    border-radius: 1rem 0 0 1rem !important;
+    font-size: 1.2rem;
+    background: #23272b !important;
+    color: #ffc107 !important;
+    border: 2px solid #ffc107 !important;
+    border-right: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    .usom-title {
+        font-size: 1.5rem;
+    }
+    .search-form-simple {
+        padding: 0.7rem;
+        width: 100%;
+        max-width: 100%;
+    }
+    .search-input-group-simple {
+        min-width: 100px;
+        max-width: 100%;
+    }
+    .search-input-custom {
+        height: 44px;
+    }
+}
+
+.card {
+    border: 1px solid #ffc107;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+    margin: 0;
+    border-radius: 8px;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    border-bottom: 2px solid #ffc107;
+}
+
+.badge {
+    font-size: 0.9em;
+}
+
+.page-link {
+    background-color: #343a40;
+    border-color: #ffc107;
+    color: #ffc107;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #343a40;
+}
+
+.page-item.active .page-link {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #343a40;
+}
+
+.page-item.disabled .page-link {
+    background-color: #343a40;
+    border-color: #6c757d;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.input-group .form-control {
+    border-color: #ffc107;
+}
+
+.input-group .btn {
+    border-color: #ffc107;
+}
+
+.card-header {
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #ffc107;
+    border-radius: 8px 8px 0 0;
+    padding: 2rem 1rem 1rem 1rem;
+}
+
+.card-body {
+    background-color: #1a1a1a;
+    border-radius: 0 0 8px 8px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-warning {
+    color: #343a40;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
