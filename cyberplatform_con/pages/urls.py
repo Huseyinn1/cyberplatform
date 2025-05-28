@@ -11,5 +11,6 @@ urlpatterns = [
    path('qr_check/',views.qrcheck_view,name="qr_check"),
    path('log_parser/',views.logparser_view,name="log_parser"),
    path('online_nmap/',views.onlinenmap_view,name="online_nmap"),
-   path('usom/',views.usom_view,name="usom")
+   path('usom/',views.usom_view,name="usom"),
+   path('ioc_checker/',views.ioc_checker_view,name="ioc_checker")
 ]

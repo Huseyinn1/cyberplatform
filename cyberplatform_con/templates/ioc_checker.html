@@ -1,0 +1,798 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="ioc-container">
+    <div class="ioc-card">
+        <div class="ioc-header text-center mb-3">
+            <i class="fas fa-shield-alt ioc-icon"></i>
+            <h2 class="ioc-title">Zararlı İçerik Kontrolü</h2>
+        </div>
+        <div class="ioc-toggle-group mb-3 d-flex justify-content-center gap-3">
+            <button class="ioc-toggle active" id="toggle-url" onclick="selectType('url')"><i class="fas fa-link"></i> URL</button>
+            <button class="ioc-toggle" id="toggle-ip" onclick="selectType('ip')"><i class="fas fa-user-shield"></i> IP</button>
+            <button class="ioc-toggle" id="toggle-hash" onclick="selectType('hash')"><i class="fas fa-hashtag"></i> Hash</button>
+            <button class="ioc-toggle" id="toggle-file" onclick="selectType('file')"><i class="fas fa-file-upload"></i> Dosya</button>
+        </div>
+        <form id="iocForm" class="ioc-form" autocomplete="off">
+            <div id="input-url" class="ioc-input-group">
+                <input type="text" class="form-control ioc-input" placeholder="Kontrol edilecek URL girin..." required>
+            </div>
+            <div id="input-ip" class="ioc-input-group d-none">
+                <input type="text" class="form-control ioc-input" placeholder="Kontrol edilecek IP adresi girin..." required>
+            </div>
+            <div id="input-hash" class="ioc-input-group d-none">
+                <input type="text" class="form-control ioc-input" placeholder="Hash değeri girin..." required>
+            </div>
+            <div id="input-file" class="ioc-input-group d-none">
+                <div class="ioc-file-upload-box mb-2" style="background:#1a2a44;border-radius:10px;padding:18px 14px 10px 14px;box-shadow:0 2px 8px rgba(79,195,247,0.08);margin-bottom:16px;">
+                    <label for="iocFileInput" style="font-weight:600;color:#4fc3f7;">Dosya Yükle</label>
+                    <input id="iocFileInput" type="file" class="form-control ioc-file mt-2" accept=".exe,.dll,.bin,.zip,.rar,.tar,.gz,.7z,.txt,.pdf,.doc,.docx,.xls,.xlsx,.jpg,.png,.elf" required>
+                </div>
+            </div>
+            <button type="submit" class="ioc-btn">
+                <i class="fas fa-search"></i> KONTROL ET
+            </button>
+        </form>
+    </div>
+</div>
+<div id="iocResult" class="ioc-result-wide mt-1"></div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+body {
+    background: radial-gradient(ellipse at center, #183153 0%, #0a1627 100%);
+    min-height: 100vh;
+}
+.ioc-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 80vh;
+    padding-top: 40px;
+}
+.ioc-card {
+    background: rgba(24, 49, 83, 0.98);
+    border-radius: 22px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+    padding: 36px 32px 32px 32px;
+    width: 100%;
+    max-width: 1200px;
+}
+.ioc-header .ioc-icon {
+    font-size: 2.5rem;
+    color: #4fc3f7;
+    margin-bottom: 8px;
+}
+.ioc-title {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.7rem;
+    margin-bottom: 0;
+}
+.ioc-toggle-group {
+    gap: 16px;
+}
+.ioc-toggle {
+    background: #223a5f;
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    padding: 8px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+}
+.ioc-toggle.active, .ioc-toggle:hover {
+    background: #4fc3f7;
+    color: #183153;
+}
+.ioc-form {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    background: #1a2a44;
+    border-radius: 12px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(79,195,247,0.08);
+}
+.ioc-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.ioc-input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #4fc3f7;
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 10px 8px;
+    outline: none;
+    margin-bottom: 0;
+    border-radius: 0;
+    transition: border-color 0.2s;
+}
+.ioc-input:focus {
+    border-bottom: 2.5px solid #fff;
+    background: #223a5f;
+}
+.ioc-file {
+    background: #223a5f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    margin-top: 4px;
+    font-size: 0.95rem;
+}
+.ioc-btn {
+    background: #4fc3f7;
+    color: #183153;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    padding: 12px 28px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-left: 8px;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px rgba(79,195,247,0.10);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ioc-btn:hover, .ioc-btn:focus {
+    background: #fff;
+    color: #183153;
+}
+.ioc-result {
+    background: #16233a;
+    border-radius: 12px;
+    padding: 18px 20px;
+    color: #fff;
+    font-size: 1rem;
+    min-height: 60px;
+    box-shadow: 0 2px 8px rgba(79,195,247,0.10);
+    display: none;
+}
+.d-none { display: none !important; }
+@media (max-width: 700px) {
+    .ioc-card { padding: 18px 6px; }
+    .ioc-form { flex-direction: column; gap: 10px; }
+    .ioc-btn { width: 100%; border-radius: 0 0 10px 10px; margin-left: 0; }
+}
+.ioc-table-title {
+    font-weight: 600;
+    color: #4fc3f7;
+    margin-bottom: 4px;
+    margin-top: 12px;
+    font-size: 1.08rem;
+}
+.ioc-table th, .ioc-table td {
+    vertical-align: middle !important;
+}
+.ioc-result-wide {
+    background: #16233a;
+    border-radius: 18px;
+    padding: 24px 32px 16px 32px;
+    color: #fff;
+    font-size: 1.08rem;
+    min-height: 80px;
+    box-shadow: 0 2px 16px rgba(79,195,247,0.13);
+    margin: 20px auto 0 auto;
+    max-width: 1200px;
+    width: 100%;
+    display: none;
+}
+.ioc-result-wide .ioc-table-title {
+    font-size: 1.2rem;
+    color: #4fc3f7;
+    font-weight: 700;
+    margin: 18px 0 8px 0;
+}
+.ioc-result-wide .table {
+    background: #1a2a44;
+    color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.ioc-result-wide th, .ioc-result-wide td {
+    vertical-align: middle !important;
+    font-size: 1.08rem;
+}
+.ioc-result-wide code {
+    color: #4fc3f7;
+    background: #223a5f;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+.ioc-result-wide .badge {
+    font-size: 1em;
+}
+@media (max-width: 900px) {
+    .ioc-result-wide { padding: 16px 4px; }
+}
+
+/* Yeni layout için güncellenen CSS */
+.ioc-main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+.ioc-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ioc-right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ioc-table-card {
+    background: #1a2a44;
+    border-radius: 14px;
+    padding: 22px 18px 14px 18px;
+    box-shadow: 0 2px 8px rgba(79,195,247,0.08);
+    width: 100%;
+}
+
+.ioc-table-card-full {
+    background: #1a2a44;
+    border-radius: 14px;
+    padding: 18px 14px 10px 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(79,195,247,0.08);
+    width: 100%;
+}
+
+.ioc-table-scroll {
+    overflow-x: auto;
+}
+
+/* Mobil için responsive */
+@media (max-width: 1000px) {
+    .ioc-main-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .ioc-result-wide { 
+        padding: 16px 12px; 
+        max-width: 100%;
+    }
+    .ioc-card { 
+        max-width: 100%; 
+    }
+}
+
+.ioc-table-flex {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.ioc-table-flex-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.ioc-table-card-left, .ioc-table-card-right {
+    flex: 1 1 350px;
+    min-width: 320px;
+    max-width: 100%;
+    background: #1a2a44;
+    border-radius: 14px;
+    padding: 18px 14px 10px 14px;
+    margin-bottom: 0;
+    box-shadow: 0 2px 8px rgba(79,195,247,0.08);
+}
+.ioc-table-card-bottom {
+    background: #1a2a44;
+    border-radius: 14px;
+    padding: 18px 14px 10px 14px;
+    margin-top: 18px;
+    box-shadow: 0 2px 8px rgba(79,195,247,0.08);
+}
+@media (max-width: 900px) {
+    .ioc-table-flex-row { flex-direction: column; gap: 10px; }
+    .ioc-table-card-left, .ioc-table-card-right { min-width: 0; }
+}
+.ioc-table-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Zararlı hash uyarısı için ek css */
+.alert-danger {
+    background: #ffeaea;
+    color: #b71c1c;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 1.08rem;
+}
+
+/* Temiz dosya için yeşil uyarı kutusu */
+.alert-success {
+    background: #eaffea;
+    color: #1c7c1c;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 1.08rem;
+}
+
+/* Modal için ek CSS */
+.ioc-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(10,22,39,0.85);
+    justify-content: center;
+    align-items: center;
+}
+.ioc-modal-content {
+    background: #16233a;
+    color: #fff;
+    border-radius: 14px;
+    padding: 32px 24px 18px 24px;
+    max-width: 600px;
+    width: 95vw;
+    margin: 60px auto 0 auto;
+    position: relative;
+    box-shadow: 0 2px 16px rgba(79,195,247,0.13);
+}
+.ioc-modal-close {
+    position: absolute;
+    right: 18px;
+    top: 12px;
+    font-size: 2rem;
+    color: #4fc3f7;
+    cursor: pointer;
+}
+@media (max-width: 700px) {
+    .ioc-modal-content { padding: 12px 4px; }
+}
+</style>
+
+<script>
+function selectType(type) {
+    document.querySelectorAll('.ioc-toggle').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('toggle-' + type).classList.add('active');
+    document.getElementById('input-url').classList.add('d-none');
+    document.getElementById('input-ip').classList.add('d-none');
+    document.getElementById('input-hash').classList.add('d-none');
+    document.getElementById('input-file').classList.add('d-none');
+    document.getElementById('input-' + type).classList.remove('d-none');
+
+    // Tüm inputlardan required'ı kaldır
+    document.querySelectorAll('#iocForm input').forEach(inp => inp.required = false);
+    // Sadece aktif input grubundaki inputlara required ekle
+    document.querySelectorAll('#input-' + type + ' input').forEach(inp => inp.required = true);
+}
+
+// Sonuçları kutuya yazan fonksiyon - Yeni layout ile
+function renderResult(type, data) {
+    let html = '';
+    if (type === 'ip') {
+        html += `
+        <div class="ioc-main-layout">
+            <div class="ioc-left-column">
+                <div class="ioc-table-card">
+                    <div class="ioc-table-title">IP Bilgileri</div>
+                    <table class="table table-dark table-bordered ioc-table mb-0">
+                        <tbody>
+                            <tr><th scope="row">IP</th><td>${data.ip}</td></tr>
+                            <tr><th scope="row">Ülke</th><td>${data.country}</td></tr>
+                            <tr><th scope="row">ASN</th><td>${data.asn} <span class="text-info">(${data.as_owner})</span></td></tr>
+                            <tr><th scope="row">VirusTotal</th><td>${data.virustotal_status}</td></tr>
+                            <tr><th scope="row">USOM</th><td>${data.usom_status}</td></tr>
+                            <tr><th scope="row">Zararlı Örnek Sayısı</th><td>${data.total_malicious_samples}</td></tr>
+                            ${data.most_dangerous_sample ? `<tr><th scope="row">En Tehlikeli Örnek</th><td><code>${data.most_dangerous_sample.sha256}</code> <span class="badge bg-danger ms-2">${data.most_dangerous_sample.positives} pozitif</span></td></tr>` : ''}
+                            ${data.latest_sample ? `<tr><th scope="row">Son Örnek</th><td><code>${data.latest_sample.sha256}</code> <span class="badge bg-warning text-dark ms-2">${data.latest_sample.positives} pozitif</span></td></tr>` : ''}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ioc-table-card">
+                    <div class="ioc-table-title">Çözümlenen Domainler</div>
+                    <div class="ioc-table-scroll">
+                    <table class="table table-dark table-bordered ioc-table mb-0">
+                        <thead>
+                            <tr><th>Domain</th><th>Son Çözümleme</th></tr>
+                        </thead>
+                        <tbody>
+                            ${(data.resolved_domains && data.resolved_domains.length) ? data.resolved_domains.map(d => `
+                                <tr>
+                                    <td>${d.hostname}</td>
+                                    <td>${d.last_resolved}</td>
+                                </tr>
+                            `).join('') : '<tr><td colspan="2">Kayıt yok</td></tr>'}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+            <div class="ioc-right-column">
+                <div class="ioc-table-card">
+                    <div class="ioc-table-title">Zararlı URL'ler</div>
+                    <div class="ioc-table-scroll">
+                    <table class="table table-dark table-bordered ioc-table mb-0">
+                        <thead>
+                            <tr><th>URL</th><th>Pozitif</th><th>Tarih</th></tr>
+                        </thead>
+                        <tbody>
+                            ${(data.malicious_urls && data.malicious_urls.length) ? data.malicious_urls.map(u => `
+                                <tr>
+                                    <td style="word-break:break-all;"><a href="${u.url}" target="_blank" class="text-info">${u.url}</a></td>
+                                    <td><span class="badge bg-danger">${u.positives}</span></td>
+                                    <td>${u.scan_date}</td>
+                                </tr>
+                            `).join('') : '<tr><td colspan="3">Kayıt yok</td></tr>'}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    } else if (type === 'hash' || type === 'file') {
+        // 1. Özet kutusu
+        const summary = data.summary || {};
+        const file = summary.file_info || {};
+        const riskLevel = summary.risk_level || 'Bilinmiyor';
+        const isLowRisk = riskLevel.toLowerCase().includes('düşük') || summary.detection_count === 0;
+        html += `
+        <div class="ioc-table-card ioc-table-card-full" style="padding:28px 24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="ioc-table-title" style="font-size:1.3rem;"><i class="fas fa-hashtag"></i> Hash Analiz Sonuçları</div>
+                <span class="badge ${isLowRisk ? 'bg-success' : 'bg-danger'}" style="font-size:1.05rem;">${riskLevel} RİSK</span>
+            </div>
+            <div class="alert ${isLowRisk ? 'alert-success' : 'alert-danger'} mt-3 mb-4" style="background:${isLowRisk ? '#eaffea' : '#ffeaea'};color:${isLowRisk ? '#1c7c1c' : '#b71c1c'};border:none;">
+                <b><i class="fas ${isLowRisk ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${summary.comment || (isLowRisk ? 'Temiz' : 'Zararlı Yazılım Tespit Edildi')}</b>
+            </div>
+            <div class="ioc-hash-summary-table" style="max-width:600px;margin:auto;">
+                <table style="width:100%;background:#1a2a44;border-radius:10px;overflow:hidden;">
+                    <tbody>
+                        <tr>
+                            <th style="width:40%;padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">DOSYA ADI</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${file.name || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">DOSYA BOYUTU</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${file.size || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">DOSYA TİPİ</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${file.type || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">MALWARE FAMILY</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${summary.malware_family || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">İLK GÖRÜLME</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${summary.first_seen || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;text-align:left;">POZİTİF</th>
+                            <td style="padding:10px 8px;">${summary.detection_count != null ? summary.detection_count : '-'} / ${summary.total_scanners != null ? summary.total_scanners : '-'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        `;
+
+        // 2. Alt kutular: VirusTotal ve MalwareBazaar
+        // --- VirusTotal ---
+        const vt = data.virustotal_result || {};
+        html += `
+        <div class="ioc-table-card ioc-table-card-full" style="margin-top:18px;">
+            <div class="ioc-table-title"><i class="fas fa-shield-virus"></i> VirusTotal Sonuçları</div>
+            <div class="ioc-table-scroll">
+                <table class="table table-dark table-bordered ioc-table mb-0">
+                    <thead>
+                        <tr><th>Antivirüs</th><th>Sonuç</th></tr>
+                    </thead>
+                    <tbody>
+                        ${(vt.detected_by || []).slice(0, 6).map(av => `
+                            <tr>
+                                <td>${av.antivirus}</td>
+                                <td><span class="badge bg-danger">${av.result}</span></td>
+                            </tr>
+                        `).join('')}
+                        ${(vt.detected_by && vt.detected_by.length > 6) ? `<tr><td colspan="2" class="text-center"><button class="btn btn-sm btn-info" onclick="showVTModal()">Tümünü Gör</button></td></tr>` : ''}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        `;
+
+        // --- MalwareBazaar ---
+        const mb = data.malwarebazaar_result || {};
+        html += `
+        <div class="ioc-table-card ioc-table-card-full" style="margin-top:18px;">
+            <div class="ioc-table-title"><i class="fas fa-bug"></i> MalwareBazaar Sonuçları</div>
+            <div class="ioc-hash-summary-table" style="max-width:600px;margin:auto;">
+                <table style="width:100%;background:#1a2a44;border-radius:10px;overflow:hidden;">
+                    <tbody>
+                        <tr>
+                            <th style="width:40%;padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">DOSYA ADI</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${mb.file_name || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">DOSYA TİPİ</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${mb.file_type || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">BOYUT</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${mb.file_size || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">İMZA</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${mb.signature || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">ETİKETLER</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${(mb.tags || []).join(', ')}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;text-align:left;">İNDİRME</th>
+                            <td style="padding:10px 8px;">${mb.intelligence?.downloads || '-'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center mt-2">
+                    <button class="btn btn-sm btn-info" onclick="showMBModal()">Detayları Gör</button>
+                </div>
+            </div>
+        </div>
+        `;
+
+        // --- Modal HTML ---
+        html += `
+        <div id="vtModal" class="ioc-modal" style="display:none;">
+            <div class="ioc-modal-content">
+                <span class="ioc-modal-close" onclick="closeVTModal()">&times;</span>
+                <h4>VirusTotal Tüm Sonuçlar</h4>
+                <div class="ioc-table-scroll" style="max-height:400px;overflow:auto;">
+                    <table class="table table-dark table-bordered ioc-table mb-0">
+                        <thead>
+                            <tr><th>Antivirüs</th><th>Sonuç</th></tr>
+                        </thead>
+                        <tbody>
+                            ${(vt.detected_by || []).map(av => `
+                                <tr>
+                                    <td>${av.antivirus}</td>
+                                    <td><span class="badge bg-danger">${av.result}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2"><a href="${vt.permalink || '#'}" target="_blank" class="btn btn-primary">VirusTotal'da Gör</a></div>
+            </div>
+        </div>
+        <div id="mbModal" class="ioc-modal" style="display:none;">
+            <div class="ioc-modal-content">
+                <span class="ioc-modal-close" onclick="closeMBModal()">&times;</span>
+                <h4>MalwareBazaar Detayları</h4>
+                <pre style="color:#fff;background:#223a5f;border-radius:8px;padding:12px;">${JSON.stringify(mb, null, 2)}</pre>
+            </div>
+        </div>
+        `;
+    } else if (type === 'url') {
+        // 1. Özet kutusu
+        const riskLevel = data.risk_level || 'Bilinmiyor';
+        const isLowRisk = riskLevel.toLowerCase().includes('düşük') || data.detection_count === 0;
+        html += `
+        <div class="ioc-table-card ioc-table-card-full" style="padding:28px 24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="ioc-table-title" style="font-size:1.3rem;"><i class="fas fa-link"></i> URL Analiz Sonuçları</div>
+                <span class="badge ${isLowRisk ? 'bg-success' : (riskLevel.toLowerCase().includes('orta') ? 'bg-warning text-dark' : 'bg-danger')}" style="font-size:1.05rem;">${riskLevel} RİSK</span>
+            </div>
+            <div class="alert ${isLowRisk ? 'alert-success' : (riskLevel.toLowerCase().includes('orta') ? 'alert-warning' : 'alert-danger')} mt-3 mb-4" style="background:${isLowRisk ? '#eaffea' : (riskLevel.toLowerCase().includes('orta') ? '#fffbe6' : '#ffeaea')};color:${isLowRisk ? '#1c7c1c' : (riskLevel.toLowerCase().includes('orta') ? '#bfa100' : '#b71c1c')};border:none;">
+                <b><i class="fas ${isLowRisk ? 'fa-check-circle' : (riskLevel.toLowerCase().includes('orta') ? 'fa-exclamation-circle' : 'fa-exclamation-triangle')}"></i> ${data.comment || ''}</b>
+            </div>
+            <div class="ioc-hash-summary-table" style="max-width:600px;margin:auto;">
+                <table style="width:100%;background:#1a2a44;border-radius:10px;overflow:hidden;">
+                    <tbody>
+                        <tr>
+                            <th style="width:40%;padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">URL</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;word-break:break-all;">${data.url || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">POZİTİF</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${data.detection_count != null ? data.detection_count : '-'} / ${data.total_scanners != null ? data.total_scanners : '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;border-bottom:1px solid #223a5f;text-align:left;">TARİH</th>
+                            <td style="padding:10px 8px;border-bottom:1px solid #223a5f;">${data.scan_date || '-'}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding:10px 8px;text-align:left;">VirusTotal</th>
+                            <td style="padding:10px 8px;"><a href="${data.permalink || '#'}" target="_blank" class="text-info">VirusTotal'da Gör</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        `;
+        // 2. detection_types tablosu
+        const types = data.detection_types || {};
+        html += `
+        <div class="ioc-table-card ioc-table-card-full" style="margin-top:18px;max-width:600px;margin-left:auto;margin-right:auto;">
+            <div class="ioc-table-title"><i class="fas fa-bug"></i> Tespit Türleri</div>
+            <table style="width:100%;background:#1a2a44;border-radius:10px;overflow:hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding:10px 8px;text-align:left;">Phishing</th>
+                        <th style="padding:10px 8px;text-align:left;">Malware</th>
+                        <th style="padding:10px 8px;text-align:left;">Malicious</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:10px 8px;">${types.phishing != null ? types.phishing : '-'}</td>
+                        <td style="padding:10px 8px;">${types.malware != null ? types.malware : '-'}</td>
+                        <td style="padding:10px 8px;">${types.malicious != null ? types.malicious : '-'}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        `;
+        // 3. detected_by örnek tablo
+        const detectedBy = data.detected_by || {};
+        const avNames = Object.keys(detectedBy);
+        html += `
+        <div class="ioc-table-card ioc-table-card-full" style="margin-top:18px;max-width:600px;margin-left:auto;margin-right:auto;">
+            <div class="ioc-table-title"><i class="fas fa-shield-virus"></i> Örnek Antivirüs Sonuçları</div>
+            <table style="width:100%;background:#1a2a44;border-radius:10px;overflow:hidden;">
+                <thead>
+                    <tr>
+                        <th style="padding:10px 8px;text-align:left;">Antivirüs</th>
+                        <th style="padding:10px 8px;text-align:left;">Sonuç</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${avNames.slice(0,5).map(av => `
+                        <tr>
+                            <td style="padding:10px 8px;">${av}</td>
+                            <td style="padding:10px 8px;"><span class="badge bg-danger">${detectedBy[av]}</span></td>
+                        </tr>
+                    `).join('')}
+                    ${avNames.length > 5 ? `<tr><td colspan="2" class="text-center"><button class="btn btn-sm btn-info" onclick="showUrlModal()">Detayları Gör</button></td></tr>` : ''}
+                </tbody>
+            </table>
+        </div>
+        `;
+        // 4. Modal
+        html += `
+        <div id="urlModal" class="ioc-modal" style="display:none;">
+            <div class="ioc-modal-content">
+                <span class="ioc-modal-close" onclick="closeUrlModal()">&times;</span>
+                <h4>Tüm Antivirüs Sonuçları</h4>
+                <div class="ioc-table-scroll" style="max-height:400px;overflow:auto;">
+                    <table class="table table-dark table-bordered ioc-table mb-0">
+                        <thead>
+                            <tr><th>Antivirüs</th><th>Sonuç</th></tr>
+                        </thead>
+                        <tbody>
+                            ${avNames.map(av => `
+                                <tr>
+                                    <td>${av}</td>
+                                    <td><span class="badge bg-danger">${detectedBy[av]}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2"><a href="${data.permalink || '#'}" target="_blank" class="btn btn-primary">VirusTotal'da Gör</a></div>
+            </div>
+        </div>
+        `;
+    }
+    document.getElementById('iocResult').style.display = 'block';
+    document.getElementById('iocResult').innerHTML = html;
+}
+
+// Modal JS
+window.showVTModal = function() {
+    var modal = document.getElementById('vtModal');
+    modal.style.display = 'flex';
+    // Sadece modal açıkken arka plana tıklama ile kapansın
+    modal.onclick = function(e) {
+        if (e.target === modal) closeVTModal();
+    };
+}
+window.closeVTModal = function() {
+    var modal = document.getElementById('vtModal');
+    modal.style.display = 'none';
+    modal.onclick = null;
+}
+window.showMBModal = function() {
+    var modal = document.getElementById('mbModal');
+    modal.style.display = 'flex';
+    modal.onclick = function(e) {
+        if (e.target === modal) closeMBModal();
+    };
+}
+window.closeMBModal = function() {
+    var modal = document.getElementById('mbModal');
+    modal.style.display = 'none';
+    modal.onclick = null;
+}
+window.showUrlModal = function() {
+    document.getElementById('urlModal').style.display = 'flex';
+}
+window.closeUrlModal = function() {
+    document.getElementById('urlModal').style.display = 'none';
+}
+
+document.getElementById('iocForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    let type = 'url';
+    if (document.getElementById('toggle-ip').classList.contains('active')) type = 'ip';
+    if (document.getElementById('toggle-hash').classList.contains('active')) type = 'hash';
+    if (document.getElementById('toggle-file').classList.contains('active')) type = 'file';
+
+    let endpoint = '';
+    let body;
+    let headers = {};
+    let result;
+
+    if (type === 'url') {
+        endpoint = 'http://localhost:1905/url/check';
+        const value = document.querySelector('#input-url input').value;
+        body = JSON.stringify({ url: value });
+        headers['Content-Type'] = 'application/json';
+    } else if (type === 'ip') {
+        endpoint = 'http://localhost:1905/ip/check';
+        const value = document.querySelector('#input-ip input').value;
+        body = JSON.stringify({ ip: value });
+        headers['Content-Type'] = 'application/json';
+    } else if (type === 'hash') {
+        endpoint = 'http://localhost:1905/hash/check';
+        const hashValue = document.querySelector('#input-hash input').value;
+        body = JSON.stringify({ hash: hashValue });
+        headers['Content-Type'] = 'application/json';
+    } else if (type === 'file') {
+        endpoint = 'http://localhost:1905/analysis/upload-and-analyze';
+        const fileInput = document.querySelector('#input-file input[type="file"]');
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        body = formData;
+    }
+
+    document.getElementById('iocResult').style.display = 'block';
+    document.getElementById('iocResult').innerHTML = '<div>Kontrol ediliyor...</div>';
+
+    try {
+        let response;
+        if (body instanceof FormData) {
+            response = await fetch(endpoint, { method: 'POST', body });
+        } else {
+            response = await fetch(endpoint, { method: 'POST', body, headers });
+        }
+        if (!response.ok) throw new Error('Sunucu hatası');
+        result = await response.json();
+        renderResult(type, result);
+    } catch (err) {
+        document.getElementById('iocResult').innerHTML = '<div class="text-danger">Bir hata oluştu: ' + err.message + '</div>';
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    selectType('url');
+});
+</script>
+{% endblock %}

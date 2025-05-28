@@ -41,6 +41,9 @@ def onlinenmap_view(request):
 def usom_view(request):
     return render(request, 'usom.html')
 
+def ioc_checker_view(request):
+    return render(request, 'ioc_checker.html')
+
 
 def contact_view(request):
     return render(request, 'contact.html')
