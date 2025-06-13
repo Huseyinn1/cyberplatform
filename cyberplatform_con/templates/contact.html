@@ -19,8 +19,11 @@
     <div id="contact" class="section wb">
         <div class="container">
             <div class="section-title text-center">
-                <h3>Need Help? Sure we are Online!</h3>
-                <p class="lead">Let us give you more details about the special offer website you want us. Please fill out the form below. <br>We have millions of website owners who are happy to work with us!</p>
+                <h3>Yardıma mı ihtiyacınız var? Uzmanlarımız çevrimiçi!</h3>
+<p class="lead">
+    Sahip olduğunuz siber güvenlik projesiyle ilgili daha fazla bilgi vermemizi ister misiniz? Aşağıdaki formu doldurun, size en uygun çözümleri sunalım. <br>
+    Birçok kurum ve birey, dijital güvenliğini bizimle sağlıyor!
+</p>
             </div><!-- end title -->
 
             <div class="row">
@@ -51,12 +54,46 @@
                 </div><!-- end col -->
                 <div class="col-xl-6 col-md-12 col-sm-12">
                     <div class="map-box">
-                        <div id="custom-places" class="small-map"></div>
+                        <div id="map" style="height: 400px; width: 100%;"></div>
                     </div>
                 </div>
             </div><!-- end row -->
         </div><!-- end container -->
     </div><!-- end section -->
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAVeUa7noekwZoxrqxRhvrMlCqNQEic1W0&callback=initMap" async defer></script>
+    <script>
+        function initMap() {
+            // Kayseri Kalesi koordinatları
+            const location = { lat: 38.7225, lng: 35.4877 };
+            
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 17,
+                center: location,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
+
+            // Marker ekleme
+            const marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: "Kayseri Kalesi",
+                animation: google.maps.Animation.DROP
+            });
+
+            // Bilgi penceresi ekleme
+            const infowindow = new google.maps.InfoWindow({
+                content: '<div style="padding: 10px;"><strong>Kayseri Kalesi</strong><br>Selçuklu, Kayseri</div>'
+            });
+
+            marker.addListener("click", () => {
+                infowindow.open(map, marker);
+            });
+        }
+    </script>
 
     <style>
         .contact_form {
@@ -100,6 +137,18 @@
 
         .contact_form .button.submit:hover {
             background-color: #0056b3;
+        }
+
+        .actions {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .actions li {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
         }
 
         .map-box {

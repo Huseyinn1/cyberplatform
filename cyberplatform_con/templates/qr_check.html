@@ -564,7 +564,7 @@
     function handleQrCode(decodedText) {
         document.getElementById("result-panel").classList.add("active");
         document.getElementById("scan-result").innerHTML = `<p>Analiz başlatılıyor...</p><span class="blinking-cursor"></span>`;
-        fetch("http://127.0.0.1:8000/scan-url", {
+        fetch("http://127.0.0.1:2001/scan-url", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: decodedText })
@@ -583,7 +583,7 @@
         document.getElementById("result-panel").classList.add("active");
         document.getElementById("scan-result").innerHTML = `<p>Dosya analiz ediliyor...</p><span class="blinking-cursor"></span>`;
 
-        fetch("http://127.0.0.1:8000/scan-qr", {
+        fetch("http://127.0.0.1:2001/scan-qr", {
             method: "POST",
             body: formData
         })
@@ -665,7 +665,7 @@
     }
 
     function fetchMaliciousHistory() {
-        fetch('http://localhost:8000/malicious-urls')
+        fetch('http://127.0.0.1:2001/malicious-urls')
             .then(response => response.json())
             .then(data => {
                 updateMaliciousHistory(data);

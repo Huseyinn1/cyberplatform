@@ -54,7 +54,7 @@ def contact_message(request):
         email = request.POST.get('email')
         message = request.POST.get('message')
         
-        subject = f"Hyperspace Contact Form"
+        subject = f"CybernoX Contact Form"
         message_body = f"Message from {name}-{email}: \n\n {message}"
         recipient_list = [settings.EMAIL_HOST_USER]
         
