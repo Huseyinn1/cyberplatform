@@ -20,9 +20,9 @@
 									<div class="big-tagline">
 										<h2><strong>CyberNox </strong> Cyber Security Companies</h2>
 										<p class="lead">Siber tehditlere karşı hızlı, akıllı ve merkezi güvenlik çözümleri.  </p>
-											<a href="#" class="hover-btn-new"><span>Contact Us</span></a>
+											<a href="{% url 'contact' %}" class="hover-btn-new"><span>Contact Us</span></a>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											<a href="#" class="hover-btn-new"><span>Read More</span></a>
+											<a href="{% url 'about' %}" class="hover-btn-new"><span>Read More</span></a>
 									</div>
 								</div>
 							</div><!-- end row -->            
@@ -45,7 +45,7 @@
 										
 											<a href="{% url 'qr_check' %}" class="hover-btn-new"><span>Uygulamayı Kullan</span></a>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											<a href="#" class="hover-btn-new"><span>İletişime Geç</span></a>
+											<a href="{% url 'contact' %}" class="hover-btn-new"><span>Contact Us</span></a>
 									</div>
 								</div>
 							</div><!-- end row -->            
@@ -68,7 +68,7 @@
 										
 											<a href="{% url 'ocr' %}" class="hover-btn-new"><span>Uygulamayı Kullan</span></a>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											<a href="#" class="hover-btn-new"><span>İletişime Geç</span></a>
+											<a href="{% url 'contact' %}" class="hover-btn-new"><span>Contact Us</span></a>
 									</div>
 								</div>
 							</div><!-- end row -->            
@@ -91,7 +91,7 @@
 										
 											<a href="{% url 'log_parser' %}" class="hover-btn-new"><span>Uygulamayı Kullan</span></a>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											<a href="#" class="hover-btn-new"><span>İletişime Geç</span></a>
+											<a href="{% url 'contact' %}" class="hover-btn-new"><span>Contact Us</span></a>
 									</div>
 								</div>
 							</div><!-- end row -->            
@@ -114,7 +114,7 @@
 										
 											<a href="{% url 'online_nmap' %}" class="hover-btn-new"><span>Uygulamayı Kullan</span></a>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											<a href="#" class="hover-btn-new"><span>İletişime Geç</span></a>
+											<a href="{% url 'contact' %}" class="hover-btn-new"><span>Contact Us</span></a>
 									</div>
 								</div>
 							</div><!-- end row -->            
@@ -137,7 +137,7 @@ IoC Kontrol Servisi, URL'ler, hash'ler ve IP adresleri gibi tehdit göstergeleri
 										
 											<a href="{% url 'ioc_checker' %}" class="hover-btn-new"><span>Uygulamayı Kullan</span></a>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											<a href="#" class="hover-btn-new"><span>İletişime Geç</span></a>
+											<a href="{% url 'contact' %}" class="hover-btn-new"><span>Contact Us</span></a>
 									</div>
 								</div>
 							</div><!-- end row -->            
@@ -159,7 +159,7 @@ USOMLinkScanner, Türkiye Ulusal Siber Olaylara Müdahale Merkezi (USOM) tarafı
 										
 											<a href="{% url 'online_nmap' %}" class="hover-btn-new"><span>Uygulamayı Kullan</span></a>
 											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-											<a href="#" class="hover-btn-new"><span>İletişime Geç</span></a>
+											<a href="{% url 'contact' %}" class="hover-btn-new"><span>Contact Us</span></a>
 									</div>
 								</div>
 							</div><!-- end row -->            
@@ -185,8 +185,8 @@ USOMLinkScanner, Türkiye Ulusal Siber Olaylara Müdahale Merkezi (USOM) tarafı
         <div class="container">
             <div class="section-title row text-center">
                 <div class="col-md-8 offset-md-2">
-                    <h3>About</h3>
-                    <p class="lead">Lorem Ipsum dolroin gravida nibh vel velit auctor aliquet. Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem!</p>
+                    <h3>Hakkımızda</h3>
+                    <p class="lead">CyberNox olarak, siber güvenlik alanında uzman ekibimizle dijital dünyanın tehditlerine karşı kapsamlı çözümler sunuyoruz. Log analizi, tehdit istihbaratı ve güvenlik testleri ile işletmenizi koruyoruz.</p>
                 </div>
             </div><!-- end title -->
         
@@ -204,9 +204,9 @@ USOMLinkScanner, Türkiye Ulusal Siber Olaylara Müdahale Merkezi (USOM) tarafı
                     <div class="message-box">
                         <h4>Cyber Security</h4>
                         <h2>{{blog.name}}</h2>
-						<p> {{blog.description}}</p>
+                        <p> {{blog.description}}</p>
 
-                        <a href="#" class="hover-btn-new orange"><span>Learn More</span></a>
+                        <a href="{% url 'blog_detail' blog.category.slug blog.id %}" class="hover-btn-new orange"><span>Learn More</span></a>
                     </div><!-- end messagebox -->
                 </div><!-- end col -->
 				{% if forloop.first %}

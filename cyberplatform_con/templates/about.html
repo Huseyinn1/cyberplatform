@@ -1,189 +1,318 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
 
-{% extends 'partials/_base.html'%}
-{% load  static %}
 {% block content %}
 
-	
-	<div class="all-title-box">
-		<div class="container text-center">
-			<h1>About Us<span class="m_1">Lorem Ipsum dolroin gravida nibh vel velit.</span></h1>
-		</div>
-	</div>
-	
-    <div id="overviews" class="section lb">
-        <div class="container">
-            <div class="section-title row text-center">
-                <div class="col-md-8 offset-md-2">
-                    <h3>About</h3>
-                    <p class="lead">Lorem Ipsum dolroin gravida nibh vel velit auctor aliquet. Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem!</p>
+<style>
+    .cyber-about-container {
+        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        min-height: 100vh;
+        padding: 50px 0;
+    }
+
+    .cyber-title-box {
+        background: url('{% static "images/.jpeg" %}') center/cover;
+        padding: 30px 0;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .cyber-title-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .cyber-title-box::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{% static "images/matrix-bg.png" %}') repeat;
+        opacity: 0.1;
+        animation: matrixRain 20s linear infinite;
+    }
+
+    .cyber-title-box h1 {
+        color: #fff;
+        font-size: 2rem;
+        text-transform: none;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+        font-weight: 500;
+    }
+
+    .cyber-about-card {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cyber-about-title {
+        color: #fff;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .cyber-about-text {
+        color: #b0b0b0;
+        font-size: 1rem;
+        line-height: 1.8;
+        margin-bottom: 20px;
+    }
+
+    .cyber-feature-card {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        padding: 30px;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .cyber-feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(255, 107, 0, 0.15);
+    }
+
+    .cyber-feature-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 107, 0, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .cyber-feature-icon i {
+        font-size: 30px;
+        color: #ff6b00;
+    }
+
+    .cyber-feature-title {
+        color: #fff;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .cyber-feature-text {
+        color: #b0b0b0;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .cyber-stats-card {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .cyber-stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(255, 107, 0, 0.15);
+    }
+
+    .cyber-stats-number {
+        color: #ff6b00;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .cyber-stats-text {
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    @keyframes matrixRain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+    }
+</style>
+
+<div class="cyber-about-container">
+    <div class="cyber-title-box">
+        <div class="container text-center">
+            <h4 style="color: #ff6b00; font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Siber Güvenlikte Güvenilir Çözüm Ortağınız</h4>
+            <h1>Hakkımızda</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <div class="cyber-about-card">
+                    <h2 class="cyber-about-title">Siber Güvenlikte Güvenilir Çözüm Ortağınız</h2>
+                    <p class="cyber-about-text">
+                        CyberPlatform olarak, dijital dünyanın güvenliğini sağlamak için 2024 yılında yola çıktık. 
+                        Amacımız, bireylerin ve kurumların siber güvenlik ihtiyaçlarını en üst düzeyde karşılamak ve 
+                        dijital varlıklarını korumaktır.
+                    </p>
+                    <p class="cyber-about-text">
+                        Uzman ekibimiz, en son teknolojileri ve güvenlik çözümlerini kullanarak, 
+                        müşterilerimize özel güvenlik stratejileri geliştiriyor. Eğitimden danışmanlığa, 
+                        güvenlik testlerinden olay müdahalesine kadar kapsamlı hizmetler sunuyoruz.
+                    </p>
                 </div>
-            </div><!-- end title -->
-        
-            <div class="row align-items-center">
-                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
-                    <div class="message-box">
-                        <h4>2018 BEST SmartEDU education school</h4>
-                        <h2>Awards Winner Support Center</h2>
-                        <p>Quisque eget nisl id nulla sagittis auctor quis id. Aliquam quis vehicula enim, non aliquam risus. Sed a tellus quis mi rhoncus dignissim.</p>
+            </div>
+        </div>
 
-                        <p> Integer rutrum ligula eu dignissim laoreet. Pellentesque venenatis nibh sed tellus faucibus bibendum. Sed fermentum est vitae rhoncus molestie. Cum sociis natoque penatibus et magnis montes, nascetur ridiculus mus. Sed vitae rutrum neque. </p>
-
-                        <a href="#" class="hover-btn-new orange"><span>Learn More</span></a>
-                    </div><!-- end messagebox -->
-                </div><!-- end col -->
-				
-				<div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
-                    <div class="post-media wow fadeIn">
-                        <img src="{% static 'images/about_02.jpg' %}" alt="" class="img-fluid img-rounded">
-                    </div><!-- end media -->
-                </div><!-- end col -->
-			</div>
-			<div class="row align-items-center">
-				<div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
-                    <div class="post-media wow fadeIn">
-                        <img src="{% static 'images/about_03.jpg' %}" alt="" class="img-fluid img-rounded">
-                    </div><!-- end media -->
-                </div><!-- end col -->
-				
-				<div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
-                    <div class="message-box">
-                        <h2>The standard Lorem Ipsum passage, used since the 1500s</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-                        <p> Integer rutrum ligula eu dignissim laoreet. Pellentesque venenatis nibh sed tellus faucibus bibendum.</p>
-
-                        <a href="#" class="hover-btn-new orange"><span>Learn More</span></a>
-                    </div><!-- end messagebox -->
-                </div><!-- end col -->
-				
-            </div><!-- end row -->
-        </div><!-- end container -->
-    </div><!-- end section -->
-	
-	<div class="hmv-box">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-4 col-md-6 col-12">
-					<div class="inner-hmv">
-						<div class="icon-box-hmv"><i class="flaticon-achievement"></i></div>
-						<h3>Mission</h3>
-						<div class="tr-pa">M</div>
-						<p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam eligendi expedita, provident cupiditate in excepturi.</p>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 col-12">
-					<div class="inner-hmv">
-						<div class="icon-box-hmv"><i class="flaticon-eye"></i></div>
-						<h3>Vision</h3>
-						<div class="tr-pa">V</div>
-						<p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam eligendi expedita, provident cupiditate in excepturi.</p>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 col-12">
-					<div class="inner-hmv">
-						<div class="icon-box-hmv"><i class="flaticon-history"></i></div>
-						<h3>History</h3>
-						<div class="tr-pa">H</div>
-						<p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam eligendi expedita, provident cupiditate in excepturi.</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-    <div id="testimonials" class="parallax section db parallax-off" style="background-image:url('images/parallax_04.jpg');">
-        <div class="container">
-            <div class="section-title text-center">
-                <h3>Testimonials</h3>
-                <p>Lorem ipsum dolor sit aet, consectetur adipisicing lit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
-            </div><!-- end title -->
-
-            <div class="row">
-                <div class="col-md-12 col-sm-12">
-                    <div class="testi-carousel owl-carousel owl-theme">
-                        <div class="testimonial clearfix">
-							<div class="testi-meta">
-                                <img src="{% static 'images/testi_01.png' %}" alt="" class="img-fluid">
-                                <h4>James Fernando </h4>
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <div class="cyber-about-card">
+                    <h2 class="cyber-about-title">Hizmetlerimiz</h2>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="cyber-feature-card">
+                                <div class="cyber-feature-icon">
+                                    <i class="fa fa-shield-alt"></i>
+                                </div>
+                                <h3 class="cyber-feature-title">Log Analizi</h3>
+                                <p class="cyber-feature-text">
+                                    Sistemlerinizdeki log kayıtlarını analiz ederek, güvenlik tehditlerini 
+                                    önceden tespit ediyor ve proaktif önlemler alıyoruz.
+                                </p>
                             </div>
-                            <div class="desc">
-                                <h3><i class="fa fa-quote-left"></i> Wonderful Support!</h3>
-                                <p class="lead">They have got my project on time with the competition with a sed highly skilled, and experienced & professional team.</p>
-                            </div>
-                            <!-- end testi-meta -->
                         </div>
-                        <!-- end testimonial -->
-
-                        <div class="testimonial clearfix">
-							<div class="testi-meta">
-                                <img src="{% static 'images/testi_02.png' %}" alt="" class="img-fluid">
-                                <h4>Jacques Philips </h4>
+                        <div class="col-lg-4">
+                            <div class="cyber-feature-card">
+                                <div class="cyber-feature-icon">
+                                    <i class="fa fa-qrcode"></i>
+                                </div>
+                                <h3 class="cyber-feature-title">QR Kod Analizi</h3>
+                                <p class="cyber-feature-text">
+                                    QR kodların güvenliğini analiz ederek, zararlı yönlendirmeleri 
+                                    ve potansiyel tehditleri tespit ediyoruz.
+                                </p>
                             </div>
-                            <div class="desc">
-                                <h3><i class="fa fa-quote-left"></i> Awesome Services!</h3>
-                                <p class="lead">Explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you completed.</p>
-                            </div>
-                            <!-- end testi-meta -->
                         </div>
-                        <!-- end testimonial -->
-
-                        <div class="testimonial clearfix">
-							<div class="testi-meta">
-                                <img src="{% static 'images/testi_03.png' %}" alt="" class="img-fluid ">
-                                <h4>Venanda Mercy </h4>
+                        <div class="col-lg-4">
+                            <div class="cyber-feature-card">
+                                <div class="cyber-feature-icon">
+                                    <i class="fa fa-check-circle"></i>
+                                </div>
+                                <h3 class="cyber-feature-title">IOC Doğrulama</h3>
+                                <p class="cyber-feature-text">
+                                    İndikatörlerin doğruluğunu kontrol ederek, güvenilir 
+                                    tehdit istihbaratı sağlıyoruz.
+                                </p>
                             </div>
-                            <div class="desc">
-                                <h3><i class="fa fa-quote-left"></i> Great & Talented Team!</h3>
-                                <p class="lead">The master-builder of human happines no one rejects, dislikes avoids pleasure itself, because it is very pursue pleasure. </p>
-                            </div>
-                            <!-- end testi-meta -->
                         </div>
-                        <!-- end testimonial -->
-                        <div class="testimonial clearfix">
-							<div class="testi-meta">
-                                <img src="{% static 'images/testi_01.png' %}" alt="" class="img-fluid">
-                                <h4>James Fernando </h4>
+                        <div class="col-lg-4">
+                            <div class="cyber-feature-card">
+                                <div class="cyber-feature-icon">
+                                    <i class="fa fa-file-text"></i>
+                                </div>
+                                <h3 class="cyber-feature-title">OCR Veri Çıkartımı</h3>
+                                <p class="cyber-feature-text">
+                                    Görüntülerden metin çıkartarak, veri analizi ve 
+                                    güvenlik değerlendirmesi yapıyoruz.
+                                </p>
                             </div>
-                            <div class="desc">
-                                <h3><i class="fa fa-quote-left"></i> Wonderful Support!</h3>
-                                <p class="lead">They have got my project on time with the competition with a sed highly skilled, and experienced & professional team.</p>
-                            </div>
-                            <!-- end testi-meta -->
                         </div>
-                        <!-- end testimonial -->
-
-                        <div class="testimonial clearfix">
-							<div class="testi-meta">
-                                <img src="{% static 'images/testi_02.png' %}" alt="" class="img-fluid">
-                                <h4>Jacques Philips </h4>
+                        <div class="col-lg-4">
+                            <div class="cyber-feature-card">
+                                <div class="cyber-feature-icon">
+                                    <i class="fa fa-network-wired"></i>
+                                </div>
+                                <h3 class="cyber-feature-title">Online Nmap</h3>
+                                <p class="cyber-feature-text">
+                                    Ağ tarama ve güvenlik değerlendirmesi için 
+                                    online Nmap hizmeti sunuyoruz.
+                                </p>
                             </div>
-                            <div class="desc">
-                                <h3><i class="fa fa-quote-left"></i> Awesome Services!</h3>
-                                <p class="lead">Explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you completed.</p>
-                            </div>
-                            <!-- end testi-meta -->
                         </div>
-                        <!-- end testimonial -->
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <div class="testimonial clearfix">
-							<div class="testi-meta">
-                                <img src="{% static 'images/testi_03.png' %}" alt="" class="img-fluid">
-                                <h4>Venanda Mercy </h4>
-                            </div>
-                            <div class="desc">
-                                <h3><i class="fa fa-quote-left"></i> Great & Talented Team!</h3>
-                                <p class="lead">The master-builder of human happines no one rejects, dislikes avoids pleasure itself, because it is very pursue pleasure. </p>
-                            </div>
-                            <!-- end testi-meta -->
-                        </div><!-- end testimonial -->
-                    </div><!-- end carousel -->
-                </div><!-- end col -->
-            </div><!-- end row -->
-        </div><!-- end container -->
-    </div><!-- end section -->
+        <div class="row mb-5">
+            <div class="col-lg-4">
+                <div class="cyber-feature-card">
+                    <div class="cyber-feature-icon">
+                        <i class="fa fa-shield"></i>
+                    </div>
+                    <h3 class="cyber-feature-title">Güvenlik Çözümleri</h3>
+                    <p class="cyber-feature-text">
+                        En son teknoloji ve güvenlik çözümleriyle sistemlerinizi koruyor, 
+                        olası tehditlere karşı proaktif önlemler alıyoruz.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cyber-feature-card">
+                    <div class="cyber-feature-icon">
+                        <i class="fa fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="cyber-feature-title">Eğitim Programları</h3>
+                    <p class="cyber-feature-text">
+                        Uzman eğitmenlerimizle siber güvenlik alanında kapsamlı eğitimler sunuyor, 
+                        profesyonel gelişiminize katkıda bulunuyoruz.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cyber-feature-card">
+                    <div class="cyber-feature-icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <h3 class="cyber-feature-title">Uzman Kadro</h3>
+                    <p class="cyber-feature-text">
+                        Alanında uzman ve deneyimli ekibimizle, en karmaşık güvenlik 
+                        sorunlarına bile etkili çözümler üretiyoruz.
+                    </p>
+                </div>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="cyber-stats-card">
+                    <div class="cyber-stats-number">1000+</div>
+                    <div class="cyber-stats-text">Mutlu Müşteri</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="cyber-stats-card">
+                    <div class="cyber-stats-number">50+</div>
+                    <div class="cyber-stats-text">Uzman Ekip</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="cyber-stats-card">
+                    <div class="cyber-stats-number">100+</div>
+                    <div class="cyber-stats-text">Tamamlanan Proje</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="cyber-stats-card">
+                    <div class="cyber-stats-number">24/7</div>
+                    <div class="cyber-stats-text">Destek</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
- {% endblock %}
+{% endblock %}

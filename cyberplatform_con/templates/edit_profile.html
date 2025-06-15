@@ -2,71 +2,71 @@
 {% load static %}
 
 {% block content %}
-    <div class="all-title-box">
+    <div class="all-title-box" style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);">
         <div class="container text-center">
-            <h1>Profili Düzenle</h1>
+            <h1 style="color: #fff; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">Profil Ayarları</h1>
+            <p style="color: #ff6b00; margin-top: 10px; font-size: 1.1rem;">Siber güvenlik yolculuğunuzu kişiselleştirin</p>
         </div>
     </div>
     
-    <div id="overviews" class="section wb">
+    <div id="overviews" class="section wb" style="background: #1a1a1a;">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    <div class="card shadow-sm">
+                    <div class="card" style="background: #2a2a2a; border: 1px solid rgba(255, 107, 0, 0.2); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
                         <div class="card-body">
                             <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                
                                 <div class="text-center mb-4">
                                     <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
                                          alt="Profil Resmi" 
                                          class="rounded-circle mb-3" 
-                                         style="width: 150px; height: 150px; object-fit: cover;">
+                                         style="width: 150px; height: 150px; object-fit: cover; border: 3px solid rgba(255, 107, 0, 0.3);">
                                     <div class="mb-3">
-                                        <label for="avatar" class="form-label">Profil Resmi</label>
-                                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                                        <label for="avatar" class="form-label" style="color: #fff;">Profil Resmi</label>
+                                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="first_name" class="form-label">Ad</label>
-                                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                                        <label for="first_name" class="form-label" style="color: #fff;">Ad</label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="last_name" class="form-label">Soyad</label>
-                                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                                        <label for="last_name" class="form-label" style="color: #fff;">Soyad</label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="username" class="form-label">Kullanıcı Adı</label>
-                                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+                                    <label for="username" class="form-label" style="color: #fff;">Kullanıcı Adı</label>
+                                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">E-posta</label>
-                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                                    <label for="email" class="form-label" style="color: #fff;">E-posta</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="bio" class="form-label">Hakkımda</label>
-                                    <textarea class="form-control" id="bio" name="bio" rows="3">{{ user.profile.bio }}</textarea>
+                                    <label for="bio" class="form-label" style="color: #fff;">Hakkımda</label>
+                                    <textarea class="form-control" id="bio" name="bio" rows="3" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">{{ user.profile.bio }}</textarea>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="phone" class="form-label">Telefon</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.profile.phone }}">
+                                    <label for="phone" class="form-label" style="color: #fff;">Telefon</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.profile.phone }}" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="address" class="form-label">Adres</label>
-                                    <textarea class="form-control" id="address" name="address" rows="2">{{ user.profile.address }}</textarea>
+                                    <label for="address" class="form-label" style="color: #fff;">Adres</label>
+                                    <textarea class="form-control" id="address" name="address" rows="2" style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">{{ user.profile.address }}</textarea>
                                 </div>
 
                                 <div class="text-center mt-4">
-                                    <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
-                                    <a href="{% url 'dashboard' %}" class="btn btn-secondary ms-2">İptal</a>
+                                    <button type="submit" class="btn" style="background: #ff6b00; color: #fff; border: none; padding: 10px 25px; border-radius: 25px;">Değişiklikleri Kaydet</button>
+                                    <a href="{% url 'dashboard' %}" class="btn ms-2" style="background: #2a2a2a; color: #fff; border: 1px solid rgba(255, 107, 0, 0.2); padding: 10px 25px; border-radius: 25px;">İptal</a>
                                 </div>
                             </form>
                         </div>
@@ -79,11 +79,26 @@
     <style>
         .form-label {
             font-weight: 500;
-            color: #333;
         }
         .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            border-color: #ff6b00;
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.25);
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .form-control::placeholder {
+            color: #666;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        .btn[style*="background: #ff6b00"]:hover {
+            background: #ff8533 !important;
+        }
+        .btn[style*="background: #2a2a2a"]:hover {
+            background: #333 !important;
         }
     </style>
+
 {% endblock %} 

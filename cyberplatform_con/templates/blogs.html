@@ -1,86 +1,355 @@
-
 {% extends 'partials/_base.html'%}
 {% load  static %}
 {% block content %}
-    <!-- Start header -->
 
-	<!-- End header -->
-	
-	<div class="all-title-box">
-		<div class="container text-center">
-			<h1>Blog </h1>
-		</div>
-	</div>
-	
-    <div id="overviews" class="section wb">
-        <div class="container">
-            <div class="row"> 
-                <div class="col-lg-9 blog-post-single">
-                    <div class="row"> 
-						{% for blog in  blogs%}
-                        <div class="col-lg-6 col-md-6 col-12 mb-4">
-                            <div class="course-item">
-                                <div class="image-blog">
-                                    <img src="{{blog.image.url}}" alt="" class="img-fluid">
-                                </div>
-                                <div class="course-br">
-                                    <div class="course-title">
-                                        <h2><a href="{% url 'blog_detail' blog.category.slug blog.id %}" title="">{{blog.name}}</a></h2>
-                                    </div>
-                                    <div class="course-desc">
-                                        <p>{{blog.description | truncatechars:100}} </p>
-                                    </div>
+<style>
+    .cyber-blog-container {
+        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        min-height: 100vh;
+        padding: 50px 0;
+    }
 
-                                </div>
-								
-                                <div class="course-meta-bot">
-                                    <ul>
-                                        <li><i class="fa fa-calendar" aria-hidden="true"></i>{{blog.date|date:"d M Y"}}</li>
-                                        <li><i class="fa fa-users" aria-hidden="true"></i> </li>
-                                        <li><i class="fa fa-book" aria-hidden="true"></i> </li>
-                                    </ul>
-                                </div>
-							
+    .cyber-title-box {
+        background: url('{% static "images/test1.jpeg" %}') center/cover;
+        padding: 30px 0;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .cyber-title-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+    }
+
+    .cyber-title-box::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{% static "images/matrix-bg.png" %}') repeat;
+        opacity: 0.1;
+        animation: matrixRain 20s linear infinite;
+    }
+
+    .cyber-title-box h1 {
+        color: #fff;
+        font-size: 2rem;
+        text-transform: none;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+        font-weight: 500;
+    }
+
+    .cyber-blog-card {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cyber-blog-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(255, 107, 0, 0.15);
+        border-color: rgba(255, 107, 0, 0.4);
+        background: #333333;
+    }
+
+    .cyber-blog-image {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cyber-blog-image img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .cyber-blog-card:hover .cyber-blog-image img {
+        transform: scale(1.1);
+    }
+
+    .cyber-blog-content {
+        padding: 25px;
+    }
+
+    .cyber-blog-title {
+        color: #fff;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        transition: color 0.3s ease;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .cyber-blog-title a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .cyber-blog-title:hover a {
+        color: #ff6b00;
+    }
+
+    .cyber-blog-desc {
+        color: #b0b0b0;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .cyber-blog-meta {
+        display: flex;
+        align-items: center;
+        color: #888;
+        font-size: 0.9rem;
+    }
+
+    .cyber-blog-meta i {
+        color: #ff6b00;
+        margin-right: 5px;
+    }
+
+    .cyber-sidebar {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cyber-search-form input {
+        background: #333333;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 25px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .cyber-search-form input:focus {
+        outline: none;
+        border-color: #ff6b00;
+        box-shadow: 0 0 10px rgba(255, 107, 0, 0.2);
+        background: #3a3a3a;
+    }
+
+    .cyber-categories, .cyber-tags {
+        margin-top: 30px;
+    }
+
+    .cyber-categories h3, .cyber-tags h3 {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(255, 107, 0, 0.2);
+        font-weight: 600;
+    }
+
+    .cyber-categories ul li, .cyber-tags ul li {
+        margin-bottom: 10px;
+    }
+
+    .cyber-categories ul li a, .cyber-tags ul li a {
+        color: #b0b0b0;
+        transition: all 0.3s ease;
+        display: block;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .cyber-categories ul li a:hover, .cyber-tags ul li a:hover {
+        color: #ff6b00;
+        background: rgba(255, 107, 0, 0.15);
+        transform: translateX(5px);
+    }
+
+    .cyber-tags ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .cyber-tags ul li a {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+    }
+
+    .cyber-tags ul li a:hover {
+        background: rgba(255, 107, 0, 0.15);
+        transform: translateY(-3px);
+    }
+
+    @keyframes matrixRain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        gap: 10px;
+    }
+
+    .pagination .page-item {
+        list-style: none;
+    }
+
+    .pagination .page-link {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background: #333333;
+        border-color: rgba(255, 107, 0, 0.4);
+        color: #ff6b00;
+    }
+
+    .pagination .active .page-link {
+        background: #ff6b00;
+        border-color: #ff6b00;
+        color: #fff;
+    }
+
+    .pagination .disabled .page-link {
+        background: #1a1a1a;
+        border-color: rgba(255, 107, 0, 0.1);
+        color: #666;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="cyber-blog-container">
+    <div class="cyber-title-box">
+        <div class="container text-center">
+            <h1>Blog Yazıları</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row"> 
+            <div class="col-lg-9 blog-post-single">
+                <div class="row"> 
+                    {% for blog in blogs %}
+                    <div class="col-lg-6 col-md-6 col-12 mb-4">
+                        <div class="cyber-blog-card">
+                            <div class="cyber-blog-image">
+                                <img src="{{blog.image.url}}" alt="{{blog.name}}">
                             </div>
-                        </div><!-- end col -->
-        
-						{% endfor %}
-                    </div><!-- end row -->
+                            <div class="cyber-blog-content">
+                                <h2 class="cyber-blog-title">
+                                    <a href="{% url 'blog_detail' blog.category.slug blog.id %}">{{blog.name}}</a>
+                                </h2>
+                                <p class="cyber-blog-desc">{{blog.description | truncatechars:100}}</p>
+                                <div class="cyber-blog-meta">
+                                    <span><i class="fa fa-calendar"></i> {{blog.date|date:"d M Y"}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if blogs.has_other_pages %}
+                <nav aria-label="Blog sayfaları">
+                    <ul class="pagination">
+                        {% if blogs.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ blogs.previous_page_number }}" aria-label="Önceki">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        {% endif %}
+
+                        {% for i in blogs.paginator.page_range %}
+                            {% if blogs.number == i %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ i }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if blogs.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ blogs.next_page_number }}" aria-label="Sonraki">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+            
+            <div class="col-lg-3 col-12">
+                <div class="cyber-sidebar">
+                    <div class="cyber-search-form">
+                        <form method="get" id="site-searchform" action="{% url 'search'%}">
+                            <input class="form-control" name="search" placeholder="Blog ara..." type="text">
+                        </form>
+                    </div>
                     
+                    <div class="cyber-categories">
+                        <h3>Kategoriler</h3>
+                        <ul>
+                            {% for category in categories %}
+                            <li><a href="{% url 'blogs_by_category' category.slug %}">{{category.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="cyber-tags">
+                        <h3>Etiketler</h3>
+                        <ul>
+                            {% for tag in tags %}
+                            <li><a href="{% url 'blogs_by_tag' tag.slug %}">{% if tag.slug in request.path %}<b>{{tag.name}}</b>{% else %}{{tag.name}}{% endif %}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-					
-
-                </div><!-- end col -->
-				<div class="col-lg-3 col-12 right-single">
-					<div class="widget-search">
-						<div class="site-search-area">
-							<form method="get" id="site-searchform" action="{% url 'search'%}">
-								<div>
-									<input class="input-text form-control" name="search"  placeholder="Search keywords..." type="text">
-									<input id="searchsubmit" value="Search" type="submit">
-								</div>
-							</form>
-						</div>
-					</div>
-					<div class="widget-categories">
-						<h3 class="widget-title">Categories</h3>
-						<ul>
-							{% for category in categories%}
-							<li><a href="{% url 'blogs_by_category' category.slug %}">{{category.name}}</a></li>
-							{% endfor %}
-
-						</ul>
-					</div>
-					<div class="widget-tags">
-						<h3 class="widget-title">Search Tags</h3>
-						<ul class="tags">
-							{% for tag in tags%}
-							<li><a href="{% url 'blogs_by_tag' tag.slug %}">{% if tag.slug in request.path%}<b>{{tag.name}}</b>{% else %}{{tag.name}}{%endif%}</a></li>
-							{% endfor %}
-						</ul>
-					</div>
-				</div>
-            </div><!-- end row -->
-        </div><!-- end container -->
-    </div><!-- end section -->
-	{% endblock %}
+{% endblock %}

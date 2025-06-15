@@ -1,269 +1,519 @@
 {% extends 'partials/_base.html'%}
 {% load  static %}
 {% block content %}
-	<!-- End header -->
-	
-	<div class="all-title-box">
-		<div class="container text-center">
-			<h1>{{blog.name}}<span class="m_1"></span></h1>
-		</div>
-	</div>
-	
-    <div id="overviews" class="section wb">
-        <div class="container">
-            <div class="row"> 
-                <div class="col-lg-9 blog-post-single">
-                    <div class="blog-item">
-						<div class="image-blog">
-							<img src="{{blog.image.url}}" alt="" class="img-fluid">
-						</div>
-						<div class="post-content">
-							<div class="post-date">
-								{% if user.is_authenticated %}
 
-								{% if blog in enrolled_blogs %}
-								<button type="submit" class="btn btn-outline-danger rounded-0" data-toggle="modal"
-									data-target="#releaseModal">
-									<span>RELEASE</span>
-								</button>
-								{% else %}
-								<button type="submit" class="btn btn-outline-success rounded-0" data-toggle="modal"
-									data-target="#enrollModal">
-									<span>ENROLL</span>
-								</button>
-								{% endif %}
-							{% endif %}
-							</div>
-							<div class="meta-info-blog">
-								<span><i class="fa fa-calendar"></i> {{blog.date|date:"d M Y"}}</span>
-						
-								<span><i class="fa fa-comments"></i> <a href="#">Customers</a></span>
-							</div>
-							<div class="blog-title">
-								<h2><a href="#" title="">{{blog.name}}</a></h2>
-							</div>
-							<div class="blog-desc">
-								
-								<blockquote class="default">
-                                        {{blog.description}}
-                                </blockquote>
-								
-							</div>							
-						</div>
-					</div>
-					
-					<div class="blog-author">
-						<div class="author-bio">
-							<h3 class="author_name"><a href="#">{{blog.customer.first.username}}</a></h3>
-							<h5>Yazar</h5>
-							<p class="author_det">
-								{{blog.description|truncatewords:30}}
-							</p>
-						</div>
-						<div class="author-desc">
-							<ul class="author-social">
-								<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li><a href="#"><i class="fa fa-skype"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					
-					<div class="blog-comments">
-						<h4 class="mb-4" style="color: #ff6b00;">
-							<i class="fa fa-comments mr-2"></i>
-							Yorumlar
-						</h4>
-						{% if messages %}
-						<div class="messages mb-4">
-							{% for message in messages %}
-							<div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-								{{ message }}
-								<button type="button" class="close" data-dismiss="alert">
-									<span>&times;</span>
-								</button>
-							</div>
-							{% endfor %}
-						</div>
-						{% endif %}
-						<div id="comment-blog">
-							<ul class="comment-list" id="comments-list">
-								{% for comment in comments %}
-								<li class="comment mb-4">
-									<div class="comment-container bg-white p-4 rounded shadow-sm" style="border-left: 4px solid #ff6b00;">
-										<div class="d-flex justify-content-between align-items-center mb-3">
-											<div class="d-flex align-items-center">
-												<div class="user-avatar mr-3">
-													<i class="fa fa-user-circle fa-2x" style="color: #ff6b00;"></i>
-												</div>
-												<div>
-													<h5 class="comment-author mb-0" style="color: #ff6b00;">
-														{{comment.user.username}}
-													</h5>
-													<small class="text-muted">
-														<i class="fa fa-clock-o mr-1"></i>
-														{{comment.created_at|date:"d M Y H:i"}}
-													</small>
-												</div>
-											</div>
-										</div>
-										<div class="comment-body">
-											<p class="mb-0 text-dark">{{comment.content}}</p>
-										</div>
-									</div>
-								</li>
-								{% endfor %}
-							</ul>
-						</div>
-					</div>
-					{% if user.is_authenticated %}
-					<div class="comments-form mt-5">
-						<h4 class="mb-4" style="color: #ff6b00;">
-							<i class="fa fa-edit mr-2"></i>
-							Yorum Yap
-						</h4>
-						<form method="POST" action="{% url 'add_comment' blog.id %}">
-							{% csrf_token %}
-							<div class="row">
-								<div class="col-md-12">
-									<div class="form-group">
-										<textarea class="form-control" name="content" rows="4" 
-											placeholder="Düşüncelerinizi paylaşın..." 
-											style="resize: none; border-radius: 10px; border: 1px solid #ff6b00;"
-											required></textarea>
-									</div>
-								</div>
-								<div class="col-md-12 post-btn">
-									<button type="submit" class="hover-btn-new orange" 
-										style="border-radius: 25px; padding: 10px 30px; background-color: #ff6b00; border: none;">
-										<i class="fa fa-paper-plane mr-2"></i>
-										<span>Yorum Gönder</span>
-									</button>
-								</div>
-							</div>
-						</form>
-					</div>
-					{% else %}
-					<div class="alert alert-warning mt-4" style="border-radius: 10px; background-color: #fff3e0; border-color: #ff6b00; color: #ff6b00;">
-						<i class="fa fa-info-circle mr-2"></i>
-						Yorum yapabilmek için lütfen <a href="{% url 'login' %}" class="font-weight-bold" style="color: #ff6b00;">giriş yapın</a>.
-					</div>
-					{% endif %}
-					
-                </div><!-- end col -->
-				<div class="col-lg-3 col-12 right-single">
-					<div class="widget-search">
-						<div class="site-search-area">
-							<form method="get" id="site-searchform" action="#">
-								<div>
-									<input class="input-text form-control" name="search-k" id="search-k" placeholder="Search keywords..." type="text">
-									<input id="searchsubmit" value="Search" type="submit">
-								</div>
-							</form>
-						</div>
-					</div>
-					<div class="widget-categories">
-						<h3 class="widget-title">Categories</h3>
-						<ul>
-							{% for category in categories%}
-							<li><a href="{% url 'blogs_by_category' category.slug %}">{{category.name}}</a></li>
-							{% endfor %}
-
-						</ul>
-					</div>
-					<div class="widget-tags">
-						<h3 class="widget-title">Search Tags</h3>
-						<ul class="tags">
-							{% for tag in tags%}
-							<li><a href="{% url 'blogs_by_tag' tag.slug %}">{% if tag.slug in request.path%}<b>{{tag.name}}</b>{% else %}{{tag.name}}{%endif%}</a></li>
-							{% endfor %}
-						</ul>
-					</div>
-				</div>
-            </div><!-- end row -->
-        </div><!-- end container -->
-    </div><!-- end section -->
-
-
-
-	
-<!-- ENROLL Modal -->
-<div class="modal fade" id="enrollModal" tabindex="-1" role="dialog" aria-labelledby="enrollModalLabel"
-aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered">
-	<div class="modal-content">
-		<div class="modal-header">
-			<h2 class="modal-title" id="enrollModalLabel">Enroll The Blog</h2>
-			<button type="button" class="close" data-dismiss="modal">
-				<span>&times;</span>
-			</button>
-		</div>
-		<div class="modal-body">
-			<p>You will enroll the blog below:</p>
-			<h1>{{blog.name}}</h1>
-		</div>
-		<div class="modal-footer">
-			<form action="{% url 'enroll_the_blog' %}" method="POST">
-				{% csrf_token %}
-				<input type="hidden" name="user_id" value="{{user.id}}">
-				<input type="hidden" name="blog_id" value="{{blog.id}}">
-				<input type="submit" value="I AM SURE" class="btn btn-success">
-			</form>
-			<button type="button" class="btn btn-secondary" data-dismiss="modal">
-				CANCEL
-			</button>
-		</div>
-	</div>
-</div>
-</div>
-
-<!-- RELEASEModal -->
-<div class="modal fade" id="releaseModal" tabindex="-1" role="dialog" aria-labelledby="releaseModalLabel"
-	aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2 class="modal-title" id="releaseModalLabel">Enroll The Blog</h2>
-				<button type="button" class="close" data-dismiss="modal">
-					<span>&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<p>You will release the blog below:</p>
-				<h1>{{blog.name}}</h1>
-			</div>
-			<div class="modal-footer">
-				<form action="{% url 'release_the_blog' %}" method="POST">
-					{% csrf_token %}
-					<input type="hidden" name="user_id" value="{{user.id}}">
-					<input type="hidden" name="blog_id" value="{{blog.id}}">
-					<input type="submit" value="I AM SURE" class="btn btn-danger">
-				</form>
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">
-					CANCEL
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-  
-    {% endblock%}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Sayfa yüklendiğinde yorumları yenile
-    const commentForm = document.querySelector('form[action*="add-comment"]');
-    if (commentForm) {
-        commentForm.addEventListener('submit', function() {
-            // Form gönderildikten sonra sayfayı yenile
-            setTimeout(function() {
-                window.location.reload();
-            }, 100);
-        });
+<style>
+    .cyber-blog-container {
+        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        min-height: 100vh;
+        padding: 50px 0;
     }
-});
-</script>
+
+    .cyber-title-box {
+        background: url('{% static "images/test1.jpeg" %}') center/cover;
+        padding: 30px 0;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .cyber-title-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .cyber-title-box::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{% static "images/matrix-bg.png" %}') repeat;
+        opacity: 0.1;
+        animation: matrixRain 20s linear infinite;
+    }
+
+    .cyber-title-box h1 {
+        color: #fff;
+        font-size: 2rem;
+        text-transform: none;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+        font-weight: 500;
+    }
+
+    .cyber-blog-content {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cyber-blog-image {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        margin-bottom: 25px;
+    }
+
+    .cyber-blog-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .cyber-blog-title {
+        color: #fff;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .cyber-blog-meta {
+        display: flex;
+        align-items: center;
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        justify-content: space-between;
+    }
+
+    .cyber-blog-meta i {
+        color: #ff6b00;
+        margin-right: 5px;
+    }
+
+    .cyber-blog-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .cyber-btn {
+        padding: 8px 20px;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .cyber-btn-enroll {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+
+    .cyber-btn-enroll:hover {
+        background: #28a745;
+        color: #fff;
+    }
+
+    .cyber-btn-release {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
+    .cyber-btn-release:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .cyber-modal {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+    }
+
+    .cyber-modal-header {
+        border-bottom: 1px solid rgba(255, 107, 0, 0.2);
+        padding: 20px;
+    }
+
+    .cyber-modal-title {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .cyber-modal-body {
+        padding: 20px;
+        color: #fff;
+    }
+
+    .cyber-modal-body p {
+        color: #b0b0b0;
+        margin-bottom: 15px;
+    }
+
+    .cyber-modal-body h1 {
+        color: #ff6b00;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .cyber-modal-footer {
+        border-top: 1px solid rgba(255, 107, 0, 0.2);
+        padding: 20px;
+    }
+
+    .cyber-modal-btn {
+        padding: 8px 20px;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        margin-left: 10px;
+    }
+
+    .cyber-modal-btn-success {
+        background: #28a745;
+        color: #fff;
+    }
+
+    .cyber-modal-btn-danger {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .cyber-modal-btn-secondary {
+        background: #6c757d;
+        color: #fff;
+    }
+
+    .cyber-blog-text {
+        color: #b0b0b0;
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+
+    .cyber-sidebar {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cyber-search-form input {
+        background: #333333;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 25px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .cyber-search-form input:focus {
+        outline: none;
+        border-color: #ff6b00;
+        box-shadow: 0 0 10px rgba(255, 107, 0, 0.2);
+        background: #3a3a3a;
+    }
+
+    .cyber-categories, .cyber-tags {
+        margin-top: 30px;
+    }
+
+    .cyber-categories h3, .cyber-tags h3 {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(255, 107, 0, 0.2);
+        font-weight: 600;
+    }
+
+    .cyber-categories ul li a, .cyber-tags ul li a {
+        color: #b0b0b0;
+        transition: all 0.3s ease;
+        display: block;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .cyber-categories ul li a:hover, .cyber-tags ul li a:hover {
+        color: #ff6b00;
+        background: rgba(255, 107, 0, 0.15);
+        transform: translateX(5px);
+    }
+
+    .cyber-tags ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .cyber-tags ul li a {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+    }
+
+    .cyber-tags ul li a:hover {
+        background: rgba(255, 107, 0, 0.15);
+        transform: translateY(-3px);
+    }
+
+    .cyber-comments {
+        background: #2a2a2a;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .cyber-comments h3 {
+        color: #fff;
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+
+    .cyber-comment {
+        background: #333333;
+        border: 1px solid rgba(255, 107, 0, 0.1);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .cyber-comment-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .cyber-comment-author {
+        color: #ff6b00;
+        font-weight: 600;
+    }
+
+    .cyber-comment-date {
+        color: #888;
+        font-size: 0.9rem;
+    }
+
+    .cyber-comment-content {
+        color: #b0b0b0;
+        line-height: 1.6;
+    }
+
+    .cyber-comment-form {
+        margin-top: 30px;
+    }
+
+    .cyber-comment-form textarea {
+        background: #333333;
+        border: 1px solid rgba(255, 107, 0, 0.2);
+        color: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        width: 100%;
+        min-height: 120px;
+        margin-bottom: 15px;
+    }
+
+    .cyber-comment-form textarea:focus {
+        outline: none;
+        border-color: #ff6b00;
+        box-shadow: 0 0 10px rgba(255, 107, 0, 0.2);
+    }
+
+    .cyber-comment-form button {
+        background: #ff6b00;
+        color: #fff;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .cyber-comment-form button:hover {
+        background: #ff8533;
+        transform: translateY(-2px);
+    }
+
+    .cyber-modal-header .close {
+        color: #fff;
+        opacity: 0.8;
+    }
+
+    .cyber-modal-header .close:hover {
+        opacity: 1;
+    }
+
+    @keyframes matrixRain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+    }
+</style>
+
+<div class="cyber-blog-container">
+    <div class="cyber-title-box">
+        <div class="container text-center">
+            <h1>{{blog.name}}</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="cyber-blog-content">
+                    <div class="cyber-blog-image">
+                        <img src="{{blog.image.url}}" alt="{{blog.name}}">
+                    </div>
+                    <div class="cyber-blog-meta">
+                        <span><i class="fa fa-calendar"></i> {{blog.date|date:"d M Y"}}</span>
+                        {% if user.is_authenticated %}
+                        <div class="cyber-blog-actions">
+                            {% if blog in enrolled_blogs %}
+                            <button type="button" class="cyber-btn cyber-btn-release" data-toggle="modal" data-target="#releaseModal">
+                                RELEASE
+                            </button>
+                            {% else %}
+                            <button type="button" class="cyber-btn cyber-btn-enroll" data-toggle="modal" data-target="#enrollModal">
+                                ENROLL
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="cyber-blog-text">
+                        {{blog.description|safe}}
+                    </div>
+                </div>
+
+                <div class="cyber-comments">
+                    <h3>Yorumlar</h3>
+                    {% for comment in comments %}
+                    <div class="cyber-comment">
+                        <div class="cyber-comment-header">
+                            <span class="cyber-comment-author">{{comment.user.username}}</span>
+                            <span class="cyber-comment-date">{{comment.created_at|date:"d M Y H:i"}}</span>
+                        </div>
+                        <div class="cyber-comment-content">
+                            {{comment.content}}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'add_comment' blog.id %}" class="cyber-comment-form">
+                        {% csrf_token %}
+                        <textarea name="content" placeholder="Yorumunuzu yazın..." required></textarea>
+                        <button type="submit">Yorum Yap</button>
+                    </form>
+                    {% else %}
+                    <p class="text-center text-muted">Yorum yapmak için lütfen <a href="{% url 'login' %}">giriş yapın</a>.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-3">
+                <div class="cyber-sidebar">
+                    <div class="cyber-search-form">
+                        <form method="get" id="site-searchform" action="{% url 'search'%}">
+                            <input class="form-control" name="search" placeholder="Blog ara..." type="text">
+                        </form>
+                    </div>
+                    
+                    <div class="cyber-categories">
+                        <h3>Kategoriler</h3>
+                        <ul>
+                            {% for category in categories %}
+                            <li><a href="{% url 'blogs_by_category' category.slug %}">{{category.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div class="cyber-tags">
+                        <h3>Etiketler</h3>
+                        <ul>
+                            {% for tag in tags %}
+                            <li><a href="{% url 'blogs_by_tag' tag.slug %}">{% if tag.slug in request.path %}<b>{{tag.name}}</b>{% else %}{{tag.name}}{% endif %}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ENROLL Modal -->
+<div class="modal fade" id="enrollModal" tabindex="-1" role="dialog" aria-labelledby="enrollModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content cyber-modal">
+            <div class="modal-header cyber-modal-header">
+                <h2 class="modal-title cyber-modal-title" id="enrollModalLabel">Enroll The Blog</h2>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body cyber-modal-body">
+                <p>You will enroll the blog below:</p>
+                <h1>{{blog.name}}</h1>
+            </div>
+            <div class="modal-footer cyber-modal-footer">
+                <form action="{% url 'enroll_the_blog' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{user.id}}">
+                    <input type="hidden" name="blog_id" value="{{blog.id}}">
+                    <input type="submit" value="I AM SURE" class="cyber-modal-btn cyber-modal-btn-success">
+                </form>
+                <button type="button" class="cyber-modal-btn cyber-modal-btn-secondary" data-dismiss="modal">
+                    CANCEL
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RELEASE Modal -->
+<div class="modal fade" id="releaseModal" tabindex="-1" role="dialog" aria-labelledby="releaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content cyber-modal">
+            <div class="modal-header cyber-modal-header">
+                <h2 class="modal-title cyber-modal-title" id="releaseModalLabel">Release The Blog</h2>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body cyber-modal-body">
+                <p>You will release the blog below:</p>
+                <h1>{{blog.name}}</h1>
+            </div>
+            <div class="modal-footer cyber-modal-footer">
+                <form action="{% url 'release_the_blog' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{user.id}}">
+                    <input type="hidden" name="blog_id" value="{{blog.id}}">
+                    <input type="submit" value="I AM SURE" class="cyber-modal-btn cyber-modal-btn-danger">
+                </form>
+                <button type="button" class="cyber-modal-btn cyber-modal-btn-secondary" data-dismiss="modal">
+                    CANCEL
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

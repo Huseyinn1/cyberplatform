@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.core.paginator import Paginator
 # Create your views here.
 def blog_list(request):
-    blogs = Blog.objects.all().order_by('-date')
     categories = Category.objects.all()
     tags = Tag.objects.all()
     current_user = request.user
@@ -15,17 +15,21 @@ def blog_list(request):
         enrolled_blogs = current_user.blogs_joined.all()
         blogs = Blog.objects.all().order_by('-date')
         for blog in enrolled_blogs:
-            blogs = blogs.exclude(id = blog.id)
-
+            blogs = blogs.exclude(id=blog.id)
     else:
         blogs = Blog.objects.all().order_by('-date')
+
+    # Sayfalama
+    paginator = Paginator(blogs, 4)  # Her sayfada 6 blog göster
+    page = request.GET.get('page')
+    blogs = paginator.get_page(page)
+
     context = {
-        
-        'blogs' : blogs,
-        'categories':categories,
-        'tags':tags
+        'blogs': blogs,
+        'categories': categories,
+        'tags': tags
     }
-    return render(request,'blogs.html',context)
+    return render(request, 'blogs.html', context)
 
 def blog_detail(request, category_slug, blog_id):
     current_user = request.user
@@ -50,38 +54,41 @@ def blog_detail(request, category_slug, blog_id):
     }
     return render(request, 'blog.html', context)
 
-def category_list(request,category_slug):
-    blogs= Blog.objects.all().filter(category__slug=category_slug)
+def category_list(request, category_slug):
+    blogs = Blog.objects.all().filter(category__slug=category_slug).order_by('-date')
     categories = Category.objects.all()
     tags = Tag.objects.all()
-    context = {
-        'blogs':blogs,
-         'categories':categories,
-         'tags':tags
-    }
-    return render(request,'blogs.html',context)
 
-def tag_list(request,tag_slug):
-    blogs= Blog.objects.all().filter(tags__slug=tag_slug)
+    context = {
+        'blogs': blogs,
+        'categories': categories,
+        'tags': tags
+    }
+    return render(request, 'blogs.html', context)
+
+def tag_list(request, tag_slug):
+    blogs = Blog.objects.all().filter(tags__slug=tag_slug).order_by('-date')
     categories = Category.objects.all()
     tags = Tag.objects.all()
+
     context = {
-        'blogs':blogs,
-         'categories':categories,
-         'tags':tags
+        'blogs': blogs,
+        'categories': categories,
+        'tags': tags
     }
-    return render(request,'blogs.html',context)
+    return render(request, 'blogs.html', context)
 
 def search(request):
-    blogs = Blog.objects.filter(name__contains = request.GET['search'])
+    blogs = Blog.objects.all().filter(name__contains=request.GET['search']).order_by('-date')
     categories = Category.objects.all()
     tags = Tag.objects.all()
+
     context = {
-        'blogs':blogs,
-         'categories':categories,
-         'tags':tags
+        'blogs': blogs,
+        'categories': categories,
+        'tags': tags
     }
-    return render(request,'blogs.html',context)
+    return render(request, 'blogs.html', context)
 
 @login_required
 def add_comment(request, blog_id):
