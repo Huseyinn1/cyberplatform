@@ -422,11 +422,96 @@
     document.getElementById('downloadPDF').addEventListener('click', function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
-        const content = document.getElementById('result').innerText;
-        doc.text(content, 10, 10);
-
-        doc.save('sonuclar.pdf');
+        
+        // Başlık
+        doc.setFontSize(20);
+        doc.setTextColor(255, 102, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text('OCR Analiz Sonucu', 105, 20, { align: 'center' });
+        
+        doc.setFontSize(12);
+        let y = 40;
+        
+        // Content
+        const contentDiv = document.querySelectorAll('.section-content')[0];
+        if (contentDiv) {
+            doc.setTextColor(255, 102, 0); // Turuncu
+            doc.setFont('helvetica', 'bold');
+            doc.text('Content:', 20, y);
+            y += 8;
+            doc.setTextColor(0, 0, 0); // Siyah
+            doc.setFont('helvetica', 'normal');
+            const contentLines = doc.splitTextToSize(contentDiv.innerText, 170);
+            contentLines.forEach(line => {
+                doc.text(line, 25, y);
+                y += 8;
+            });
+            y += 4;
+        }
+        
+        // Status
+        const statusDiv = document.querySelectorAll('.section-content')[1];
+        if (statusDiv) {
+            doc.setTextColor(255, 102, 0); // Turuncu
+            doc.setFont('helvetica', 'bold');
+            doc.text('Status:', 20, y);
+            y += 8;
+            doc.setTextColor(0, 0, 0); // Siyah
+            doc.setFont('helvetica', 'normal');
+            const statusLines = doc.splitTextToSize(statusDiv.innerText, 170);
+            statusLines.forEach(line => {
+                doc.text(line, 25, y);
+                y += 8;
+            });
+            y += 4;
+        }
+        
+        // Findings
+        const findingsTable = document.querySelector('table');
+        if (findingsTable) {
+            doc.setTextColor(255, 102, 0); // Turuncu
+            doc.setFont('helvetica', 'bold');
+            doc.text('Findings:', 20, y);
+            y += 8;
+            const rows = findingsTable.querySelectorAll('tr:not(:first-child)');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length === 3) {
+                    // Type
+                    doc.setTextColor(30, 144, 255); // Mavi
+                    doc.setFont('helvetica', 'bold');
+                    const typeLine = `Type:`;
+                    doc.text(typeLine, 25, y);
+                    doc.setTextColor(0, 0, 0); // Siyah
+                    doc.setFont('helvetica', 'normal');
+                    const typeValue = doc.splitTextToSize(cells[0].innerText, 140);
+                    doc.text(typeValue, 45, y);
+                    y += 8;
+                    // Value
+                    doc.setTextColor(30, 144, 255); // Mavi
+                    doc.setFont('helvetica', 'bold');
+                    const valueLine = `Value:`;
+                    doc.text(valueLine, 25, y);
+                    doc.setTextColor(0, 0, 0); // Siyah
+                    doc.setFont('helvetica', 'normal');
+                    const valueValue = doc.splitTextToSize(cells[1].innerText, 140);
+                    doc.text(valueValue, 45, y);
+                    y += 8;
+                    // Valid
+                    doc.setTextColor(30, 144, 255); // Mavi
+                    doc.setFont('helvetica', 'bold');
+                    const validLine = `Valid:`;
+                    doc.text(validLine, 25, y);
+                    doc.setTextColor(0, 0, 0); // Siyah
+                    doc.setFont('helvetica', 'normal');
+                    const validValue = doc.splitTextToSize(cells[2].innerText, 140);
+                    doc.text(validValue, 45, y);
+                    y += 12;
+                }
+            });
+        }
+        
+        doc.save('OCR_Analiz_Sonucu.pdf');
     });
 </script>
 {% endblock %}
