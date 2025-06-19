@@ -2,13 +2,165 @@
 {% load static %}
 
 {% block content %}
+<style>
+    #logreg .modal-content {
+        background: linear-gradient(135deg, #181c24 60%, #232526 100%);
+        color: #e0f7fa;
+        border-radius: 18px;
+        border: 2px solid #00ffea;
+        box-shadow: 0 0 32px 2px #00ffea44, 0 0 0 2px #00ffea33;
+        padding: 0;
+        overflow: hidden;
+        position: relative;
+    }
+    #logreg .modal-header {
+        background: #181c24;
+        border-bottom: 1px solid #00ffea44;
+        padding: 24px 32px 16px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #logreg .modal-logo {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+    #logreg .modal-logo-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        box-shadow: 0 0 16px #00ffea44;
+        border: 2px solid #00ffea44;
+    }
+    #logreg .modal-title {
+        color: #00ffea;
+        font-size: 1.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-shadow: 0 0 8px #00ffea99;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    #logreg .modal-subtitle {
+        color: #b0b0b0;
+        font-size: 0.95rem;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        margin-bottom: 0;
+        text-align: center;
+    }
+    #logreg .close {
+        color: #00ffea;
+        font-size: 2rem;
+        opacity: 1;
+        transition: color 0.2s, text-shadow 0.2s;
+        text-shadow: 0 0 8px #00ffea, 0 0 2px #00ffea;
+    }
+    #logreg .close:hover {
+        color: #fff;
+        text-shadow: 0 0 16px #00ffea, 0 0 8px #00ffea;
+    }
+    #logreg .modal-body {
+        background: #232526;
+        padding: 32px 32px 24px 32px;
+    }
+    #logreg .form-group {
+        margin-bottom: 22px;
+        position: relative;
+    }
+    #logreg .input-icon {
+        position: absolute;
+        left: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #00ffea;
+        font-size: 1.1rem;
+        z-index: 2;
+    }
+    #logreg input[type="text"],
+    #logreg input[type="password"] {
+        background: #181c24;
+        border: 1.5px solid #00ffea44;
+        color: #e0f7fa;
+        border-radius: 10px;
+        padding: 12px 16px 12px 48px;
+        font-size: 1.08rem;
+        width: 100%;
+        transition: border 0.2s, box-shadow 0.2s;
+        box-shadow: none;
+    }
+    #logreg input[type="text"]:focus,
+    #logreg input[type="password"]:focus {
+        border: 1.5px solid #00ffea;
+        outline: none;
+        box-shadow: 0 0 8px #00ffea44;
+    }
+    #logreg .btn {
+        background: linear-gradient(90deg, #00ffea 0%, #00ff99 100%);
+        color: #181c24;
+        font-weight: 700;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 32px;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 12px #00ffea33;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+    }
+    #logreg .btn:hover {
+        background: linear-gradient(90deg, #00ffea 0%, #00ff99 100%);
+        color: #fff;
+        box-shadow: 0 4px 24px #00ffea77;
+    }
+    #logreg .modal-footer-links {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #00ffea22;
+    }
+    #logreg .modal-footer-links a {
+        color: #00ffea;
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin: 0 12px;
+        transition: color 0.2s, text-shadow 0.2s;
+    }
+    #logreg .modal-footer-links a:hover {
+        color: #fff;
+        text-shadow: 0 0 8px #00ffea;
+    }
+    #logreg .modal-copyright {
+        text-align: center;
+        margin-top: 12px;
+        color: #888;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+    #logreg .alert {
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-bottom: 18px;
+    }
+    @media (max-width: 600px) {
+        #logreg .modal-content, #logreg .modal-body, #logreg .modal-header {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
+</style>
 
 <div class="modal fade show" id="logreg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header tit-up">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Login</h4>
+                <div class="modal-logo">
+                    <img src="{% static 'images/logo2.png' %}" alt="CyberNox" class="modal-logo-img">
+                </div>
+                <div style="text-align: center; flex-grow: 1;">
+                    <h4 class="modal-title">Giriş Yap</h4>
+                    <p class="modal-subtitle">Sisteme Güvenle Erişin</p>
+                </div>
             </div>
             <div class="modal-body customer-box">
                 <!-- Tab panes -->
@@ -29,20 +181,31 @@
 
                             <div class="form-group">
                                 <div class="col-sm-12">
+                                    <i class="fa fa-user input-icon"></i>
                                     {{form.username}}
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-12">
+                                    <i class="fa fa-lock input-icon"></i>
                                     {{form.password}}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-10">
-                                    <input type="submit" value="Submit" class="btn btn-light btn-radius btn-brd grd1">
+                                    <input type="submit" value="Giriş Yap" class="btn btn-light btn-radius btn-brd grd1">
                                 </div>
                             </div>
                         </form>
+                        
+                        <div class="modal-footer-links">
+                            <a href="#">Şifremi Unuttum</a>
+                            <a href="#">Yardım</a>
+                        </div>
+                        
+                        <div class="modal-copyright">
+                            © CyberNox 2024 - Siber Güvenlik Platformu
+                        </div>
                     </div>
                 </div>
             </div>
