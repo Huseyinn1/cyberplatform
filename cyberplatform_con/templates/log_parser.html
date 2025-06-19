@@ -380,6 +380,91 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #4a4a4a;
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        background: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background: linear-gradient(135deg, #181c24 60%, #232526 100%);
+        color: #00ffea;
+        margin: 10% auto;
+        padding: 2.2rem 2.5rem 1.7rem 2.5rem;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 0 24px 2px #00ffea44, 0 0 0 2px #00ffea33;
+        border: 2px solid #00ffea;
+        position: relative;
+        overflow: hidden;
+        animation: cyberGlow 1.2s ease-in;
+    }
+    .modal-content::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: repeating-linear-gradient(120deg, #00ffea11 0 2px, transparent 2px 20px);
+        pointer-events: none;
+        z-index: 0;
+        border-radius: 16px;
+        animation: matrixRain 3s linear infinite;
+    }
+    @keyframes cyberGlow {
+        0% { box-shadow: 0 0 0 0 #00ffea00; border-color: #232526; }
+        100% { box-shadow: 0 0 24px 2px #00ffea44, 0 0 0 2px #00ffea33; border-color: #00ffea; }
+    }
+    @keyframes matrixRain {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+    }
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 18px;
+        font-size: 2rem;
+        color: #00ffea;
+        cursor: pointer;
+        z-index: 2;
+        text-shadow: 0 0 8px #00ffea, 0 0 2px #00ffea;
+        transition: color 0.2s, text-shadow 0.2s;
+    }
+    .close-modal:hover {
+        color: #fff;
+        text-shadow: 0 0 16px #00ffea, 0 0 8px #00ffea;
+    }
+    .modal-cyber-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #00ffea;
+        margin-bottom: 1.1rem;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        z-index: 2;
+        position: relative;
+        text-shadow: 0 0 8px #00ffea99;
+    }
+    .modal-cyber-title i {
+        font-size: 1.5rem;
+        color: #00ffea;
+        filter: drop-shadow(0 0 4px #00ffea);
+    }
+    #modal-details {
+        font-size: 1.08rem;
+        color: #e0f7fa;
+        z-index: 2;
+        position: relative;
+    }
 </style>
 
 <div class="log-container">
@@ -476,6 +561,7 @@
                                     <th>IP Adresi</th>
                                     <th>Deneme/Hata Sayısı</th>
                                     <th>Son İşlem Zamanı</th>
+                                    <th>Detay</th>
                                 </tr>
                             </thead>
                             <tbody id="anomaly-list">
@@ -486,6 +572,15 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal HTML -->
+<div id="anomaly-modal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <div class="modal-cyber-title"><i class="fas fa-shield-alt"></i> Anomali Detayı</div>
+    <div id="modal-details"></div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -697,6 +792,7 @@ function updateApacheDashboard(data) {
                 <td class="anomaly-ip">${anomaly.ip}</td>
                 <td class="anomaly-count">${count !== undefined ? count : '-'}</td>
                 <td class="anomaly-time">${time !== undefined ? time : '-'}</td>
+                <td><button class="btn btn-detail" data-index="${anomalyList.children.length}">Detay</button></td>
             `;
             anomalyList.appendChild(tr);
         });
@@ -825,6 +921,9 @@ function updateApacheDashboard(data) {
             }
         });
     }
+
+    // anomalyDataCache'i doldur
+    anomalyDataCache = data.anomali_raporu || [];
 }
 
 function updateSyslogDashboard(data) {
@@ -1499,5 +1598,63 @@ function updateIPChart(ipData) {
         }
     });
 }
+
+// Modal fonksiyonları
+let anomalyDataCache = [];
+function openAnomalyModal(anomaly) {
+  const modal = document.getElementById('anomaly-modal');
+  const details = document.getElementById('modal-details');
+  let count = '';
+  let time = '';
+  if (
+    anomaly.tip === 'brute_force_saldirisi' ||
+    anomaly.tip === 'supheli_dosya_erisimi' ||
+    anomaly.tip === 'sql_injection_denemesi' ||
+    anomaly.tip === 'xss_denemesi'
+  ) {
+    count = anomaly.toplam_deneme;
+    time = anomaly.son_deneme;
+  } else if (anomaly.tip === 'yuksek_hata_orani') {
+    count = anomaly.toplam_hata;
+    time = anomaly.son_hata;
+  } else if (anomaly.tip === 'rate_limiting_ihlali') {
+    count = anomaly.istek_sayisi;
+    time = anomaly.zaman;
+  }
+  function getAnomalyTypeLabel(tip) {
+    const typeLabels = {
+      'brute_force_saldirisi': 'Brute Force Saldırısı',
+      'yuksek_hata_orani': 'Yüksek Hata Oranı',
+      'supheli_dosya_erisimi': 'Şüpheli Dosya Erişimi',
+      'sql_injection_denemesi': 'SQL Injection Denemesi',
+      'xss_denemesi': 'XSS Denemesi',
+      'rate_limiting_ihlali': 'Rate Limiting İhlali'
+    };
+    return typeLabels[tip] || tip;
+  }
+  details.innerHTML = `
+    <div style="margin-bottom:0.7rem;"><i class="fas fa-bug" style="color:#00ffea;margin-right:7px;"></i><strong>Anomali Tipi:</strong> ${getAnomalyTypeLabel(anomaly.tip)}</div>
+    <div style="margin-bottom:0.7rem;"><i class="fas fa-network-wired" style="color:#00ffea;margin-right:7px;"></i><strong>IP Adresi:</strong> ${anomaly.ip}</div>
+    <div style="margin-bottom:0.7rem;"><i class="fas fa-exclamation-triangle" style="color:#00ffea;margin-right:7px;"></i><strong>Deneme/Hata Sayısı:</strong> ${count !== undefined ? count : '-'}</div>
+    <div style="margin-bottom:0.7rem;"><i class="fas fa-clock" style="color:#00ffea;margin-right:7px;"></i><strong>Son İşlem Zamanı:</strong> ${time !== undefined ? time : '-'}</div>
+    <div style="margin-bottom:0.7rem;"><i class="fas fa-terminal" style="color:#00ffea;margin-right:7px;"></i><strong>Örnek İstek:</strong> ${anomaly.ornek_istek ? anomaly.ornek_istek : '-'}</div>
+  `;
+  modal.style.display = 'flex';
+  modal.classList.remove('hidden');
+}
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('btn-detail')) {
+    const index = e.target.getAttribute('data-index');
+    openAnomalyModal(anomalyDataCache[index]);
+  }
+  if (e.target.classList.contains('close-modal')) {
+    document.getElementById('anomaly-modal').style.display = 'none';
+    document.getElementById('anomaly-modal').classList.add('hidden');
+  }
+  if (e.target.id === 'anomaly-modal') {
+    document.getElementById('anomaly-modal').style.display = 'none';
+    document.getElementById('anomaly-modal').classList.add('hidden');
+  }
+});
 </script>
 {% endblock %}
