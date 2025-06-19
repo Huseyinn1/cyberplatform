@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from . forms import LoginForm, RegisterForm
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from blogs.models import Blog
@@ -107,5 +107,35 @@ def edit_profile(request):
         return redirect('dashboard')
     
     return render(request, 'edit_profile.html')
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        user = request.user
+
+        if not user.check_password(current_password):
+            messages.error(request, '❌ Mevcut şifreniz yanlış! Lütfen tekrar deneyin.')
+            return redirect('edit_profile')
+
+        if new_password != confirm_password:
+            messages.error(request, '❌ Yeni şifreler eşleşmiyor! Lütfen aynı şifreyi iki kez yazın.')
+            return redirect('edit_profile')
+
+        if len(new_password) < 8:
+            messages.error(request, '❌ Yeni şifre en az 8 karakter olmalıdır!')
+            return redirect('edit_profile')
+
+        user.set_password(new_password)
+        user.save()
+        
+        messages.success(request, '✅ Şifreniz başarıyla değiştirildi! Güvenlik için tekrar giriş yapmanız gerekiyor.')
+        logout(request)  # Kullanıcıyı çıkış yaptır
+        return redirect('login')
+
+    return redirect('edit_profile')
 
     

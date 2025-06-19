@@ -73,6 +73,59 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Şifre Değiştirme Kartı -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-6">
+                    <div class="card" style="background: #2a2a2a; border: 1px solid rgba(255, 107, 0, 0.2); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
+                        <div class="card-header" style="background: #1a1a1a; border-bottom: 1px solid rgba(255, 107, 0, 0.2);">
+                            <h4 style="color: #fff; margin: 0; text-align: center;">🔐 Şifre Değiştir</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{% url 'change_password' %}" id="passwordForm">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label" style="color: #fff;">Mevcut Şifre</label>
+                                    <input type="password" class="form-control" id="current_password" name="current_password" required style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="new_password" class="form-label" style="color: #fff;">Yeni Şifre</label>
+                                    <input type="password" class="form-control" id="new_password" name="new_password" required style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="confirm_password" class="form-label" style="color: #fff;">Yeni Şifre (Tekrar)</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required style="background: #1a1a1a; border: 1px solid rgba(255, 107, 0, 0.2); color: #fff;">
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn" style="background: #ff6b00; color: #fff; border: none; padding: 10px 25px; border-radius: 25px;">Şifreyi Değiştir</button>
+                                    <button type="button" class="btn ms-2" onclick="clearPasswordForm()" style="background: #2a2a2a; color: #fff; border: 1px solid rgba(255, 107, 0, 0.2); padding: 10px 25px; border-radius: 25px;">Temizle</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pop-up Modal -->
+    <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background: #2a2a2a; border: 1px solid rgba(255, 107, 0, 0.2);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(255, 107, 0, 0.2);">
+                    <h5 class="modal-title" id="passwordModalLabel" style="color: #fff;">Bilgi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+                </div>
+                <div class="modal-body" style="color: #fff;">
+                    <p id="modalMessage"></p>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid rgba(255, 107, 0, 0.2);">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background: #ff6b00; color: #fff; border: none; padding: 8px 20px; border-radius: 20px;">Tamam</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -99,6 +152,62 @@
         .btn[style*="background: #2a2a2a"]:hover {
             background: #333 !important;
         }
+        .modal-content {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
     </style>
+
+    <script>
+        // Şifre formu temizleme
+        function clearPasswordForm() {
+            document.getElementById('current_password').value = '';
+            document.getElementById('new_password').value = '';
+            document.getElementById('confirm_password').value = '';
+            showModal('Şifre alanları temizlendi!');
+        }
+
+        // Modal gösterme fonksiyonu
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            var modal = new bootstrap.Modal(document.getElementById('passwordModal'));
+            modal.show();
+        }
+
+        // Form gönderimi kontrolü
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            var currentPassword = document.getElementById('current_password').value;
+            var newPassword = document.getElementById('new_password').value;
+            var confirmPassword = document.getElementById('confirm_password').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                e.preventDefault();
+                showModal('❌ Lütfen tüm alanları doldurun!');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                e.preventDefault();
+                showModal('❌ Yeni şifreler eşleşmiyor!');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                e.preventDefault();
+                showModal('❌ Yeni şifre en az 8 karakter olmalıdır!');
+                return;
+            }
+
+            showModal('✅ Şifre değiştirme işlemi başlatılıyor...');
+        });
+
+        // Sayfa yüklendiğinde mesajları kontrol et
+        window.onload = function() {
+            {% if messages %}
+                {% for message in messages %}
+                    showModal("{{ message|escapejs }}");
+                {% endfor %}
+            {% endif %}
+        };
+    </script>
 
 {% endblock %} 
