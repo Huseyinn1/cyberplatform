@@ -86,13 +86,14 @@
     }
 
     .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        display: flex;
+        flex-direction: column;
         gap: 1.5rem;
         margin-top: 2rem;
     }
 
     .dashboard-card {
+        width: 100%;
         background: #1a1a1a;
         border: 1px solid #333333;
         border-radius: 12px;
@@ -471,9 +472,9 @@
                         <table class="anomaly-table" id="anomaly-table">
                             <thead>
                                 <tr>
-                                    <th>Tip</th>
-                                    <th>IP</th>
-                                    <th>Toplam Deneme/Hata</th>
+                                    <th>Anomali Tipi</th>
+                                    <th>IP Adresi</th>
+                                    <th>Deneme/Hata Sayısı</th>
                                     <th>Son İşlem Zamanı</th>
                                 </tr>
                             </thead>
@@ -662,27 +663,40 @@ function updateApacheDashboard(data) {
     anomalyList.innerHTML = '';
     if (data.anomali_raporu) {
         data.anomali_raporu.forEach(anomaly => {
-            const tr = document.createElement('tr');
-            
             let count = '';
             let time = '';
-            
-            if (anomaly.tip === 'brute_force_saldirisi') {
+            if (
+                anomaly.tip === 'brute_force_saldirisi' ||
+                anomaly.tip === 'supheli_dosya_erisimi' ||
+                anomaly.tip === 'sql_injection_denemesi' ||
+                anomaly.tip === 'xss_denemesi'
+            ) {
                 count = anomaly.toplam_deneme;
                 time = anomaly.son_deneme;
             } else if (anomaly.tip === 'yuksek_hata_orani') {
                 count = anomaly.toplam_hata;
                 time = anomaly.son_hata;
-            } else if (anomaly.tip === 'supheli_dosya_erisimi') {
-                count = anomaly.toplam_deneme;
-                time = anomaly.son_deneme;
+            } else if (anomaly.tip === 'rate_limiting_ihlali') {
+                count = anomaly.istek_sayisi;
+                time = anomaly.zaman;
             }
-            
+            function getAnomalyTypeLabel(tip) {
+                const typeLabels = {
+                    'brute_force_saldirisi': 'Brute Force Saldırısı',
+                    'yuksek_hata_orani': 'Yüksek Hata Oranı',
+                    'supheli_dosya_erisimi': 'Şüpheli Dosya Erişimi',
+                    'sql_injection_denemesi': 'SQL Injection Denemesi',
+                    'xss_denemesi': 'XSS Denemesi',
+                    'rate_limiting_ihlali': 'Rate Limiting İhlali'
+                };
+                return typeLabels[tip] || tip;
+            }
+            const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="anomaly-type">${anomaly.tip}</td>
+                <td class="anomaly-type">${getAnomalyTypeLabel(anomaly.tip)}</td>
                 <td class="anomaly-ip">${anomaly.ip}</td>
-                <td class="anomaly-count">${count}</td>
-                <td class="anomaly-time">${time}</td>
+                <td class="anomaly-count">${count !== undefined ? count : '-'}</td>
+                <td class="anomaly-time">${time !== undefined ? time : '-'}</td>
             `;
             anomalyList.appendChild(tr);
         });
@@ -791,7 +805,20 @@ function updateApacheDashboard(data) {
                         grid: { color: 'rgba(0, 255, 0, 0.1)' }
                     },
                     x: {
-                        ticks: { color: '#00ff00' },
+                        ticks: {
+                            color: '#00ff00',
+                            maxRotation: 45,
+                            minRotation: 30,
+                            autoSkip: false,
+                            maxTicksLimit: 30,
+                            callback: function(value, index, values) {
+                                const label = this.getLabelForValue(value);
+                                if (label && label.length > 10) {
+                                    return label.slice(5, 10) + ' ' + label.slice(11, 16);
+                                }
+                                return label;
+                            }
+                        },
                         grid: { color: 'rgba(0, 255, 0, 0.1)' }
                     }
                 }
