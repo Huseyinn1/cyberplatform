@@ -54,18 +54,44 @@ def contact_message(request):
         email = request.POST.get('email')
         message = request.POST.get('message')
         
-        subject = f"CybernoX Contact Form"
-        message_body = f"Message from {name}-{email}: \n\n {message}"
+        # Form validasyonu
+        if not name or not email or not message:
+            return JsonResponse({
+                'success': False,
+                'message': 'Lütfen tüm alanları doldurun.'
+            })
+        
+        subject = f"CybernoX Contact Form - {name}"
+        message_body = f"""
+Yeni İletişim Mesajı
+
+Gönderen: {name}
+E-posta: {email}
+
+Mesaj:
+{message}
+
+---
+Bu mesaj CybernoX platformu üzerinden gönderilmiştir.
+        """
         recipient_list = [settings.EMAIL_HOST_USER]
         
         try:
-            send_mail(subject,message_body,email,recipient_list)
-        except Exception:
-            messages.error(request,"Something happend")
-        else:
-            messages.success(request,"We have received your email")
+            send_mail(subject, message_body, email, recipient_list)
+            return JsonResponse({
+                'success': True,
+                'message': 'Mesajınız başarıyla gönderildi!'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': 'Mesaj gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
+            })
     
-    return HttpResponseRedirect(reverse('index')+'#three')
+    return JsonResponse({
+        'success': False,
+        'message': 'Geçersiz istek.'
+    })
 
 
 @csrf_exempt  # CSRF korumasını geçici olarak devre dışı bırakıyoruz (gerçek uygulamalarda CSRF'yi uygun şekilde yapılandırmalısınız)
